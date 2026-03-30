@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ProctorDesk — Modern College</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#090c12;--s1:#0f1319;--s2:#161b24;--s3:#1d2433;
+  --border:#1f2836;--border2:#283244;
+  --text:#dde3f0;--muted:#5a6b8a;--muted2:#3d4e68;
+  --accent:#4f8cff;--accent2:#7b5cfa;
+  --ok:#22d1a0;--warn:#ffaa00;--danger:#ff4055;--critical:#ff1a35;
+  --font:'DM Sans',sans-serif;--head:'Syne',sans-serif;--mono:'JetBrains Mono',monospace;
+  --r:8px;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font);font-size:13px;height:100vh;overflow:hidden;display:flex;flex-direction:column;}
+
+/* Login */
+.login-ov{position:fixed;inset:0;background:rgba(0,0,0,.92);backdrop-filter:blur(10px);z-index:1000;display:flex;align-items:center;justify-content:center;}
+.login-card{background:var(--s1);border:1px solid var(--border2);border-radius:18px;padding:36px;width:340px;}
+.login-card h2{font-family:var(--head);font-size:22px;margin-bottom:6px;background:linear-gradient(135deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+.login-card p{font-size:13px;color:var(--muted);margin-bottom:24px;}
+.login-card input{width:100%;padding:11px 14px;margin-bottom:12px;background:var(--s2);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);font-family:var(--font);font-size:13px;outline:none;transition:border-color .15s;}
+.login-card input:focus{border-color:var(--accent);}
+.login-card button{width:100%;padding:11px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--r);color:#fff;font-family:var(--head);font-size:14px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.login-card button:hover{opacity:.9;}
+.login-err{font-size:12px;color:var(--danger);margin-top:8px;text-align:center;display:none;}
+
+/* Top bar */
+.topbar{height:52px;background:var(--s1);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 20px;gap:16px;flex-shrink:0;}
+.tb-logo{display:flex;align-items:center;gap:9px;}
+.tb-logo-icon{width:32px;height:32px;border-radius:8px;background:linear-gradient(135deg,var(--accent),var(--accent2));display:flex;align-items:center;justify-content:center;font-size:13px;color:#fff;font-family:var(--head);font-weight:800;}
+.tb-title{font-family:var(--head);font-size:16px;font-weight:800;}
+.tb-title span{color:var(--accent);}
+.tb-exam{font-size:11px;color:var(--muted);background:var(--s2);padding:3px 9px;border-radius:5px;border:1px solid var(--border);}
+.tb-sp{flex:1;}
+.tb-stats{display:flex;gap:20px;}
+.tb-stat{text-align:center;}
+.tb-stat-val{font-family:var(--mono);font-size:20px;font-weight:500;line-height:1;}
+.tb-stat-val.ok{color:var(--ok);}
+.tb-stat-val.warn{color:var(--warn);}
+.tb-stat-val.danger{color:var(--danger);}
+.tb-stat-lbl{font-size:9px;color:var(--muted);margin-top:2px;text-transform:uppercase;letter-spacing:.05em;}
+.tb-clock{font-family:var(--mono);font-size:13px;color:var(--muted);background:var(--s2);padding:4px 11px;border-radius:6px;border:1px solid var(--border);}
+.tb-logout{padding:6px 14px;background:rgba(255,64,85,.12);border:1px solid rgba(255,64,85,.25);border-radius:6px;color:var(--danger);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.tb-logout:hover{background:var(--danger);color:#fff;}
+
+/* Main layout */
+.main-layout{flex:1;display:flex;overflow:hidden;}
+
+/* Feeds */
+.feeds{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+.panel-hd{padding:12px 18px;border-bottom:1px solid var(--border);background:var(--s1);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+.panel-hd-title{font-family:var(--head);font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;color:var(--text);}
+.panel-hd-meta{font-size:11px;color:var(--muted);margin-left:auto;}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--danger);animation:livepulse 1.4s ease-in-out infinite;}
+@keyframes livepulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,64,85,.5);}60%{opacity:.7;box-shadow:0 0 0 6px rgba(255,64,85,0);}}
+.feeds-grid{flex:1;overflow-y:auto;padding:14px;display:grid;grid-template-columns:repeat(auto-fill,minmax(195px,1fr));gap:12px;align-content:start;}
+.feeds-grid::-webkit-scrollbar{width:4px;}
+.feeds-grid::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px;}
+
+/* Student Card */
+.s-card{background:var(--s1);border:1px solid var(--border);border-radius:10px;overflow:hidden;cursor:pointer;transition:border-color .2s,transform .15s;}
+.s-card:hover{transform:translateY(-2px);border-color:var(--border2);}
+.s-card.flagged{border-color:rgba(255,170,0,.5);}
+.s-card.critical{border-color:var(--danger);animation:cardFlash 1.2s ease-in-out infinite;}
+.s-card.offline{opacity:.5;}
+@keyframes cardFlash{0%,100%{border-color:var(--danger);}50%{border-color:var(--critical);box-shadow:0 0 12px rgba(255,26,53,.3);}}
+.cam-frame{position:relative;background:#060810;aspect-ratio:16/9;overflow:hidden;}
+.cam-frame img{width:100%;height:100%;object-fit:cover;display:block;}
+.cam-placeholder{width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#0d1020,#0a0d18);flex-direction:column;gap:6px;}
+.cam-placeholder .icon{font-size:24px;opacity:.3;}
+.cam-placeholder .txt{font-size:10px;color:var(--muted2);}
+.cam-status{position:absolute;top:6px;left:6px;font-size:9px;font-weight:600;padding:2px 7px;border-radius:4px;background:rgba(0,0,0,.6);}
+.cam-status.ok{color:var(--ok);}
+.cam-status.warn{color:var(--warn);}
+.cam-status.danger{color:var(--danger);}
+.cam-time{position:absolute;top:6px;right:6px;font-size:9px;font-family:var(--mono);color:var(--muted);background:rgba(0,0,0,.6);padding:2px 6px;border-radius:4px;}
+.cam-flags{position:absolute;bottom:6px;right:6px;background:var(--danger);color:#fff;font-size:9px;font-weight:600;padding:2px 7px;border-radius:12px;}
+.cam-flags.zero{background:rgba(34,209,160,.2);color:var(--ok);}
+.card-info{padding:9px 11px;display:flex;align-items:center;gap:8px;}
+.card-av{width:26px;height:26px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;background:rgba(79,140,255,.15);color:var(--accent);}
+.card-name{font-weight:600;font-size:12px;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-enroll{font-size:10px;color:var(--muted);}
+.card-warn-btn{width:26px;height:26px;background:rgba(255,170,0,.1);border:1px solid rgba(255,170,0,.2);border-radius:6px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--warn);font-size:12px;flex-shrink:0;transition:all .15s;}
+.card-warn-btn:hover{background:var(--warn);color:#000;}
+
+/* Right col */
+.right-col{width:310px;flex-shrink:0;display:flex;flex-direction:column;background:var(--s1);border-left:1px solid var(--border);overflow:hidden;}
+.viol-list{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;}
+.viol-list::-webkit-scrollbar{width:3px;}
+.viol-list::-webkit-scrollbar-thumb{background:var(--border2);}
+.v-card{background:var(--s2);border:1px solid var(--border);border-left:3px solid var(--muted2);border-radius:var(--r);padding:9px 10px;cursor:pointer;transition:background .15s;}
+.v-card:hover{background:var(--s3);}
+.v-card.HIGH{border-left-color:var(--warn);}
+.v-card.CRITICAL{border-left-color:var(--danger);}
+.v-card.MEDIUM{border-left-color:var(--accent);}
+.v-top{display:flex;align-items:center;gap:7px;margin-bottom:4px;}
+.v-sev{font-size:10px;font-weight:600;padding:2px 7px;border-radius:4px;}
+.v-sev.HIGH{background:rgba(255,170,0,.12);color:var(--warn);}
+.v-sev.CRITICAL{background:rgba(255,64,85,.12);color:var(--danger);}
+.v-sev.MEDIUM{background:rgba(79,140,255,.12);color:var(--accent);}
+.v-name{font-weight:600;font-size:12px;flex:1;}
+.v-time{font-size:10px;color:var(--muted);}
+.v-desc{font-size:11px;color:var(--muted);line-height:1.5;}
+
+/* Log */
+.log-sect{height:160px;display:flex;flex-direction:column;border-top:1px solid var(--border);}
+.log-list{flex:1;overflow-y:auto;padding:8px 12px;}
+.log-list::-webkit-scrollbar{width:3px;}
+.log-entry{display:flex;gap:8px;font-family:var(--mono);font-size:10px;margin-bottom:4px;line-height:1.5;}
+.log-ts{color:var(--muted2);}
+.log-msg{}.log-msg.ok{color:var(--ok);}.log-msg.warn{color:var(--warn);}.log-msg.danger{color:var(--danger);}
+
+/* Compose */
+.compose{flex-shrink:0;padding:14px;border-top:1px solid var(--border);background:var(--s2);}
+.compose-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:9px;}
+.compose-row{display:flex;gap:6px;margin-bottom:8px;}
+.compose-sel,.compose-sev{background:var(--s1);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);padding:7px 10px;font-size:12px;font-family:var(--font);outline:none;}
+.compose-sel{flex:1;}
+.quick-row{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:8px;}
+.qbtn{padding:4px 9px;background:var(--s1);border:1px solid var(--border2);border-radius:5px;color:var(--muted);font-size:10px;cursor:pointer;transition:all .15s;}
+.qbtn:hover{border-color:var(--accent);color:var(--accent);}
+.compose-ta{width:100%;background:var(--s1);border:1px solid var(--border2);border-radius:var(--r);color:var(--text);padding:9px 10px;font-size:12px;resize:none;height:60px;margin-bottom:8px;font-family:var(--font);outline:none;}
+.compose-ta:focus{border-color:var(--accent);}
+.send-btn{width:100%;padding:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;border-radius:var(--r);color:#fff;font-family:var(--head);font-size:13px;font-weight:700;cursor:pointer;transition:opacity .15s;}
+.send-btn:hover{opacity:.9;}
+
+/* Modal */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.75);backdrop-filter:blur(6px);z-index:600;display:none;align-items:center;justify-content:center;}
+.modal-ov.open{display:flex;}
+.modal{background:var(--s1);border:1px solid var(--border2);border-radius:16px;width:480px;max-height:80vh;overflow-y:auto;}
+.modal::-webkit-scrollbar{width:4px;}
+.modal::-webkit-scrollbar-thumb{background:var(--border2);}
+.modal-hd{padding:18px 20px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;}
+.modal-hd h3{font-family:var(--head);font-size:16px;}
+.modal-close{cursor:pointer;font-size:18px;color:var(--muted);background:none;border:none;}
+.modal-body{padding:20px;}
+.modal-stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.mstat{padding:12px;border-radius:8px;text-align:center;background:var(--s2);}
+.mstat .n{font-family:var(--mono);font-size:20px;font-weight:500;}
+.mstat .l{font-size:10px;color:var(--muted);margin-top:3px;}
+.photo-preview{width:80px;height:80px;border-radius:50%;object-fit:cover;border:3px solid var(--accent);display:block;margin:0 auto 16px;}
+.modal-section-title{font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:8px;margin-top:14px;}
+.modal-v-item{background:var(--s2);border-left:3px solid var(--muted2);border-radius:6px;padding:8px 10px;margin-bottom:6px;font-size:12px;}
+.modal-v-item.HIGH{border-left-color:var(--warn);}
+.modal-v-item.CRITICAL{border-left-color:var(--danger);}
+.modal-v-item .vtype{font-weight:600;color:var(--warn);font-size:11px;}
+.modal-v-item.CRITICAL .vtype{color:var(--danger);}
+.modal-actions{display:flex;gap:8px;margin-top:16px;flex-wrap:wrap;}
+.ma-btn{padding:8px 16px;border-radius:var(--r);border:none;font-family:var(--font);font-size:12px;font-weight:600;cursor:pointer;transition:all .15s;}
+.ma-btn.warn-btn{background:rgba(255,170,0,.12);border:1px solid rgba(255,170,0,.25);color:var(--warn);}
+.ma-btn.warn-btn:hover{background:var(--warn);color:#000;}
+.ma-btn.term-btn{background:rgba(255,64,85,.12);border:1px solid rgba(255,64,85,.25);color:var(--danger);}
+.ma-btn.term-btn:hover{background:var(--danger);color:#fff;}
+
+/* Toast */
+.toast-wrap{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:9999;display:flex;flex-direction:column;gap:7px;align-items:center;}
+.toast{background:var(--ok);color:#0a1a12;padding:8px 20px;border-radius:30px;font-size:12.5px;font-weight:600;opacity:0;transition:opacity .2s;white-space:nowrap;}
+.toast.show{opacity:1;}
+.toast.error{background:var(--danger);color:#fff;}
+.toast.warn-t{background:var(--warn);color:#000;}
+.toast.info{background:var(--accent);color:#fff;}
+
+/* Empty state */
+.empty-state{grid-column:1/-1;text-align:center;padding:60px 20px;color:var(--muted);}
+.empty-state .ei{font-size:40px;margin-bottom:12px;opacity:.3;}
+.empty-state p{font-size:13px;}
+</style>
+</head>
+<body>
+
+<!-- Login Overlay -->
+<div class="login-ov" id="loginOv">
+  <div class="login-card">
+    <h2>ProctorDesk</h2>
+    <p>Staff monitoring panel — Modern College</p>
+    <input type="text" id="sUser" placeholder="Username" value="proctor">
+    <input type="password" id="sPass" placeholder="Password" value="proctor123">
+    <button onclick="doLogin()">Login to Monitor</button>
+    <div class="login-err" id="loginErr">Invalid credentials</div>
+  </div>
+</div>
+
+<!-- Top Bar -->
+<div class="topbar">
+  <div class="tb-logo"><div class="tb-logo-icon">PD</div><div class="tb-title">Proctor<span>Desk</span></div></div>
+  <div class="tb-exam" id="tbExam">Connecting…</div>
+  <div class="tb-sp"></div>
+  <div class="tb-stats">
+    <div class="tb-stat"><div class="tb-stat-val ok" id="st-active">0</div><div class="tb-stat-lbl">Active</div></div>
+    <div class="tb-stat"><div class="tb-stat-val warn" id="st-flagged">0</div><div class="tb-stat-lbl">Flagged</div></div>
+    <div class="tb-stat"><div class="tb-stat-val danger" id="st-critical">0</div><div class="tb-stat-lbl">Critical</div></div>
+    <div class="tb-stat"><div class="tb-stat-val" id="st-online">0</div><div class="tb-stat-lbl">Online</div></div>
+  </div>
+  <div class="tb-clock" id="tbClock">--:--:--</div>
+  <button class="tb-logout" onclick="logout()">Logout</button>
+</div>
+
+<!-- Main -->
+<div class="main-layout">
+  <!-- Feeds -->
+  <div class="feeds">
+    <div class="panel-hd">
+      <div class="live-dot"></div>
+      <div class="panel-hd-title">Live Camera Feeds</div>
+      <div class="panel-hd-meta" id="feedsMeta">0 students</div>
+    </div>
+    <div class="feeds-grid" id="feedsGrid">
+      <div class="empty-state"><div class="ei">📡</div><p>Waiting for exam sessions…</p></div>
+    </div>
+  </div>
+
+  <!-- Right col -->
+  <div class="right-col">
+    <!-- Violations -->
+    <div class="panel-hd" style="flex-shrink:0;">
+      <div class="panel-hd-title">Violations</div>
+      <div class="panel-hd-meta" id="violCount">0</div>
+    </div>
+    <div class="viol-list" id="violList" style="flex:1;">
+      <div style="text-align:center;color:var(--muted);padding:24px;font-size:12px;">No violations yet</div>
+    </div>
+
+    <!-- Log -->
+    <div class="log-sect">
+      <div class="panel-hd" style="flex-shrink:0;"><div class="panel-hd-title">Activity Log</div><div class="panel-hd-meta" id="logCount">0</div></div>
+      <div class="log-list" id="logList"></div>
+    </div>
+
+    <!-- Compose -->
+    <div class="compose">
+      <div class="compose-lbl">⚡ Send Warning</div>
+      <div class="compose-row">
+        <select class="compose-sel" id="composeStudent"><option value="">— Select student —</option></select>
+        <select class="compose-sev" id="composeSev">
+          <option value="MEDIUM">MED</option>
+          <option value="HIGH">HIGH</option>
+          <option value="CRITICAL">CRIT</option>
+        </select>
+      </div>
+      <div class="quick-row">
+        <button class="qbtn" onclick="setMsg('Please look at your screen.')">👁 Look at screen</button>
+        <button class="qbtn" onclick="setMsg('Remove all devices from desk.')">📵 No devices</button>
+        <button class="qbtn" onclick="setMsg('No talking allowed during exam.')">🔇 No talking</button>
+        <button class="qbtn" onclick="setMsg('Sit up straight and face the camera.')">🎥 Face camera</button>
+      </div>
+      <textarea class="compose-ta" id="composeMsg" placeholder="Type warning message…"></textarea>
+      <button class="send-btn" onclick="sendWarning()">SEND WARNING →</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail Modal -->
+<div class="modal-ov" id="detailModal">
+  <div class="modal">
+    <div class="modal-hd">
+      <h3 id="detailTitle">Student Details</h3>
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div class="modal-body" id="detailBody"></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toastWrap"></div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://YOUR-RAILWAY-APP.railway.app';  // ← UPDATE THIS
+
+const WS_BASE = API_BASE.replace('http','ws').replace('https','wss');
+
+// ── STATE ────────────────────────────────────────────────────
+let sessions = [];
+let violations = [];
+let proctorWS = null;
+let refreshInt = null;
+let loggedIn = false;
+
+// ── API ──────────────────────────────────────────────────────
+async function api(path, body = null) {
+    const opts = { method: body ? 'POST' : 'GET', headers: { 'Content-Type': 'application/json' } };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${path}`, opts);
+    if (!res.ok) { const e = await res.json().catch(()=>({})); throw new Error(e.detail || `HTTP ${res.status}`); }
+    return res.json();
+}
+
+// ── LOGIN ────────────────────────────────────────────────────
+async function doLogin() {
+    const u = document.getElementById('sUser').value.trim();
+    const p = document.getElementById('sPass').value.trim();
+    try {
+        const res = await api('/api/staff/login', { username: u, password: p });
+        document.getElementById('loginOv').style.display = 'none';
+        loggedIn = true;
+        addLog('Staff logged in', 'ok');
+        toast('Welcome, ' + res.staff_name, 'success');
+        connectProctorWS();
+        loadSessions();
+        refreshInt = setInterval(loadSessions, 6000);
+    } catch (e) {
+        document.getElementById('loginErr').style.display = 'block';
+    }
+}
+
+function logout() {
+    if (proctorWS) proctorWS.close();
+    clearInterval(refreshInt);
+    loggedIn = false;
+    document.getElementById('loginOv').style.display = 'flex';
+    sessions = []; violations = [];
+    renderFeeds();
+}
+
+// ── PROCTOR WEBSOCKET ────────────────────────────────────────
+function connectProctorWS() {
+    try {
+        proctorWS = new WebSocket(`${WS_BASE}/api/staff/ws/proctor`);
+
+        proctorWS.onopen = () => {
+            addLog('WebSocket connected — live feeds active', 'ok');
+            toast('Live feed connected', 'success');
+        };
+
+        proctorWS.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+
+            if (data.type === 'student_list') {
+                // Initial list of online students
+                addLog(`${data.students.length} students online`, 'ok');
+            }
+
+            if (data.type === 'student_joined') {
+                addLog(`${data.meta.student_name} joined exam`, 'ok');
+                loadSessions(); // refresh list
+            }
+
+            if (data.type === 'student_disconnected') {
+                addLog(`Student disconnected`, 'warn');
+                // Mark offline
+                const card = document.querySelector(`[data-hash="${data.student_hash}"]`);
+                if (card) card.classList.add('offline');
+            }
+
+            if (data.type === 'snapshot') {
+                // Update live cam image
+                const img = document.querySelector(`img[data-hash="${data.student_hash}"]`);
+                if (img) {
+                    img.src = data.snapshot;
+                    img.style.display = 'block';
+                    // Hide placeholder
+                    const ph = img.previousElementSibling;
+                    if (ph && ph.classList.contains('cam-placeholder')) ph.style.display = 'none';
+                }
+                // Update status dot
+                const statusEl = document.querySelector(`.cam-status[data-hash="${data.student_hash}"]`);
+                if (statusEl && statusEl.className.includes('cam-status')) {
+                    statusEl.textContent = '● LIVE';
+                    statusEl.className = 'cam-status ok';
+                }
+            }
+
+            if (data.type === 'violation') {
+                addLog(`VIOLATION: ${data.meta?.student_name || '?'} — ${data.flag_type}`, 'danger');
+                addViolation(data);
+                loadSessions(); // update flag counts
+            }
+
+            if (data.type === 'flag_updated') {
+                // Update flag badge on card
+                const badge = document.querySelector(`.cam-flags[data-hash="${data.student_hash}"]`);
+                if (badge) {
+                    badge.textContent = `${data.flag_count} FLAG${data.flag_count !== 1 ? 'S' : ''}`;
+                    badge.className = `cam-flags${data.flag_count === 0 ? ' zero' : ''}`;
+                }
+                // Update card class
+                const card = document.querySelector(`[data-hash="${data.student_hash}"]`);
+                if (card) {
+                    card.classList.remove('flagged','critical');
+                    if (data.flag_count >= 3) card.classList.add('critical');
+                    else if (data.flag_count > 0) card.classList.add('flagged');
+                }
+            }
+        };
+
+        proctorWS.onclose = () => {
+            addLog('WebSocket disconnected — reconnecting…', 'warn');
+            setTimeout(connectProctorWS, 3000);
+        };
+    } catch (e) {
+        console.error('WS connect failed:', e);
+        setTimeout(connectProctorWS, 5000);
+    }
+}
+
+// ── LOAD SESSIONS ────────────────────────────────────────────
+async function loadSessions() {
+    try {
+        const res = await api('/api/staff/sessions');
+        sessions = res.sessions || [];
+        updateStats();
+        renderFeeds();
+        updateComposeSelect();
+    } catch (e) {
+        console.error('Load sessions failed:', e);
+    }
+}
+
+function updateStats() {
+    const active   = sessions.length;
+    const flagged  = sessions.filter(s => s.flag_count > 0 && s.flag_count < 3).length;
+    const critical = sessions.filter(s => s.flag_count >= 3).length;
+    const online   = sessions.filter(s => s.online).length;
+    document.getElementById('st-active').textContent   = active;
+    document.getElementById('st-flagged').textContent  = flagged;
+    document.getElementById('st-critical').textContent = critical;
+    document.getElementById('st-online').textContent   = online;
+    document.getElementById('feedsMeta').textContent   = `${active} student${active !== 1 ? 's' : ''} active`;
+    if (sessions.length) {
+        document.getElementById('tbExam').textContent = 'B.Sc. CS — Unit Test I';
+    }
+}
+
+// ── RENDER FEEDS ─────────────────────────────────────────────
+function renderFeeds() {
+    const grid = document.getElementById('feedsGrid');
+    if (sessions.length === 0) {
+        grid.innerHTML = '<div class="empty-state"><div class="ei">📡</div><p>No active exam sessions</p></div>';
+        return;
+    }
+
+    // Preserve existing cards, only add/remove
+    const existingHashes = new Set([...grid.querySelectorAll('[data-hash]')].map(el => el.dataset.hash));
+    const newHashes = new Set(sessions.map(s => s.student_hash));
+
+    // Remove cards for ended sessions
+    existingHashes.forEach(hash => {
+        if (!newHashes.has(hash)) {
+            grid.querySelector(`[data-hash="${hash}"]`)?.remove();
+        }
+    });
+
+    sessions.forEach(s => {
+        const existing = grid.querySelector(`[data-hash="${s.student_hash}"]`);
+        const initials = s.student_name.split(' ').map(n => n[0]).join('').toUpperCase().substring(0, 2);
+        const statusCls = s.flag_count >= 3 ? 'critical' : s.flag_count > 0 ? 'flagged' : '';
+        const statusTxt = s.flag_count >= 3 ? '● CRITICAL' : s.flag_count > 0 ? '● FLAGGED' : s.online ? '● LIVE' : '● OFFLINE';
+        const statusColor = s.flag_count >= 3 ? 'danger' : s.flag_count > 0 ? 'warn' : s.online ? 'ok' : '';
+        const flagBadgeCls = s.flag_count === 0 ? ' zero' : '';
+
+        if (!existing) {
+            // Create new card
+            const card = document.createElement('div');
+            card.className = `s-card ${statusCls} ${!s.online ? 'offline' : ''}`;
+            card.dataset.hash = s.student_hash;
+            card.dataset.id = s.id;
+            card.onclick = () => openDetail(s.id, s.student_name);
+            card.innerHTML = `
+                <div class="cam-frame">
+                    <div class="cam-placeholder">
+                        <div class="icon">📷</div>
+                        <div class="txt">Waiting for feed…</div>
+                    </div>
+                    <img data-hash="${s.student_hash}" src="" style="display:none;position:absolute;inset:0;width:100%;height:100%;object-fit:cover;">
+                    <div class="cam-status ${statusColor}" data-hash="${s.student_hash}">${statusTxt}</div>
+                    <div class="cam-time">${formatElapsed(s.start_time)}</div>
+                    <div class="cam-flags${flagBadgeCls}" data-hash="${s.student_hash}">${s.flag_count} FLAG${s.flag_count !== 1 ? 'S' : ''}</div>
+                </div>
+                <div class="card-info">
+                    <div class="card-av">${initials}</div>
+                    <div>
+                        <div class="card-name">${s.student_name}</div>
+                        <div class="card-enroll">${s.enrollment_no || 'No enrollment'}</div>
+                    </div>
+                    <div class="card-warn-btn" onclick="event.stopPropagation();quickWarn(${s.id},'${s.student_name}')">⚡</div>
+                </div>`;
+            grid.appendChild(card);
+        } else {
+            // Update existing card status
+            existing.className = `s-card ${statusCls} ${!s.online ? 'offline' : ''}`;
+        }
+    });
+}
+
+function updateComposeSelect() {
+    const sel = document.getElementById('composeStudent');
+    const cur = sel.value;
+    sel.innerHTML = '<option value="">— Select student —</option>';
+    sessions.forEach(s => {
+        const opt = document.createElement('option');
+        opt.value = s.id;
+        opt.textContent = `${s.student_name}`;
+        if (s.id == cur) opt.selected = true;
+        sel.appendChild(opt);
+    });
+}
+
+function formatElapsed(startStr) {
+    const elapsed = Math.floor((Date.now() - new Date(startStr)) / 1000);
+    const m = Math.floor(elapsed / 60).toString().padStart(2,'0');
+    const s = (elapsed % 60).toString().padStart(2,'0');
+    return `${m}:${s}`;
+}
+
+// ── VIOLATIONS ───────────────────────────────────────────────
+function addViolation(data) {
+    violations.unshift(data);
+    document.getElementById('violCount').textContent = violations.length;
+
+    const list = document.getElementById('violList');
+    if (list.querySelector('[data-empty]')) list.innerHTML = '';
+
+    const el = document.createElement('div');
+    el.className = `v-card ${data.severity || 'MEDIUM'}`;
+    el.onclick = () => openDetail(null, data.meta?.student_name);
+    el.innerHTML = `
+        <div class="v-top">
+            <span class="v-sev ${data.severity}">${data.severity}</span>
+            <span class="v-name">${data.meta?.student_name || 'Unknown'}</span>
+            <span class="v-time">${new Date().toLocaleTimeString()}</span>
+        </div>
+        <div class="v-desc">${data.flag_type}: ${data.description || ''}</div>`;
+    list.prepend(el);
+}
+
+// ── DETAIL MODAL ─────────────────────────────────────────────
+async function openDetail(sessionId, studentName) {
+    document.getElementById('detailTitle').textContent = studentName || 'Student Details';
+
+    if (!sessionId) {
+        document.getElementById('detailModal').classList.add('open');
+        return;
+    }
+
+    try {
+        const res = await api(`/api/staff/session/${sessionId}`);
+        const { session, flags, warnings } = res;
+
+        const photoHtml = session.photo_url
+            ? `<img class="photo-preview" src="${session.photo_url}" alt="ID Photo" onerror="this.style.display='none'">`
+            : '';
+
+        const flagsHtml = flags.length > 0
+            ? flags.map(f => `<div class="modal-v-item ${f.severity}">
+                <div class="vtype">${f.severity} — ${f.flag_type}</div>
+                <div style="font-size:11px;color:var(--muted);margin-top:3px;">${f.description} · ${new Date(f.created_at).toLocaleTimeString()}</div>
+              </div>`).join('')
+            : '<div style="color:var(--muted);font-size:12px;">No violations recorded</div>';
+
+        const warnHtml = warnings.length > 0
+            ? warnings.map(w => `<div class="log-entry"><span class="log-ts">${new Date(w.sent_at).toLocaleTimeString()}</span><span class="log-msg warn">${w.message}</span></div>`).join('')
+            : '<div style="color:var(--muted);font-size:12px;">No warnings sent</div>';
+
+        document.getElementById('detailBody').innerHTML = `
+            ${photoHtml}
+            <div class="modal-stat-row">
+                <div class="mstat"><div class="n" style="color:var(--danger);">${session.flag_count || 0}</div><div class="l">Violations</div></div>
+                <div class="mstat"><div class="n" style="color:var(--warn);">${warnings.length}</div><div class="l">Warnings Sent</div></div>
+            </div>
+            <div class="modal-section-title">Violations</div>
+            ${flagsHtml}
+            <div class="modal-section-title" style="margin-top:14px;">Warnings Sent</div>
+            <div>${warnHtml}</div>
+            <div class="modal-actions">
+                <button class="ma-btn warn-btn" onclick="quickWarnById(${sessionId})">⚡ Send Warning</button>
+                <button class="ma-btn term-btn" onclick="terminateSession(${sessionId})">🛑 Terminate Session</button>
+            </div>`;
+
+        document.getElementById('detailModal').classList.add('open');
+    } catch (e) {
+        toast('Failed to load details', 'error');
+    }
+}
+
+function closeModal() { document.getElementById('detailModal').classList.remove('open'); }
+
+function quickWarn(sessionId, studentName) {
+    document.getElementById('composeStudent').value = sessionId;
+    document.getElementById('composeMsg').focus();
+    toast(`Preparing warning for ${studentName}`, 'info');
+}
+
+function quickWarnById(sessionId) {
+    closeModal();
+    document.getElementById('composeStudent').value = sessionId;
+    document.getElementById('composeMsg').focus();
+}
+
+async function terminateSession(sessionId) {
+    if (!confirm('Terminate this student\'s exam session?')) return;
+    try {
+        await api('/api/staff/terminate', { session_id: sessionId });
+        toast('Session terminated', 'success');
+        addLog('Session terminated', 'danger');
+        closeModal();
+        loadSessions();
+    } catch (e) {
+        toast('Failed to terminate: ' + e.message, 'error');
+    }
+}
+
+// ── SEND WARNING ─────────────────────────────────────────────
+async function sendWarning() {
+    const sessionId = parseInt(document.getElementById('composeStudent').value);
+    const message   = document.getElementById('composeMsg').value.trim();
+    const severity  = document.getElementById('composeSev').value;
+    if (!sessionId) { toast('Select a student', 'warn-t'); return; }
+    if (!message)   { toast('Enter a message', 'warn-t'); return; }
+
+    try {
+        await api('/api/staff/send-warning', { session_id: sessionId, message, severity });
+        toast('Warning sent', 'success');
+        addLog(`Warning sent: ${message.substring(0,40)}`, 'ok');
+        document.getElementById('composeMsg').value = '';
+    } catch (e) {
+        toast('Failed to send: ' + e.message, 'error');
+    }
+}
+
+function setMsg(msg) { document.getElementById('composeMsg').value = msg; }
+
+// ── LOG ──────────────────────────────────────────────────────
+function addLog(msg, cls = '') {
+    const list = document.getElementById('logList');
+    const el = document.createElement('div');
+    el.className = 'log-entry';
+    el.innerHTML = `<span class="log-ts">${new Date().toLocaleTimeString()}</span><span class="log-msg ${cls}">${msg}</span>`;
+    list.prepend(el);
+    const cnt = document.getElementById('logCount');
+    cnt.textContent = list.children.length;
+    if (list.children.length > 100) list.removeChild(list.lastChild);
+}
+
+// ── CLOCK ────────────────────────────────────────────────────
+setInterval(() => {
+    document.getElementById('tbClock').textContent = new Date().toLocaleTimeString('en-IN', { hour12: false });
+    // Update elapsed times
+    document.querySelectorAll('.cam-time').forEach(el => {
+        const card = el.closest('[data-hash]');
+        if (!card) return;
+        const hash = card.dataset.hash;
+        const s = sessions.find(x => x.student_hash === hash);
+        if (s) el.textContent = formatElapsed(s.start_time);
+    });
+}, 1000);
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.textContent = msg;
+    document.getElementById('toastWrap').appendChild(el);
+    requestAnimationFrame(() => el.classList.add('show'));
+    setTimeout(() => { el.classList.remove('show'); setTimeout(() => el.remove(), 300); }, 3000);
+}
+
+// Handle Enter key in login
+document.addEventListener('keydown', e => {
+    if (e.key === 'Enter' && document.getElementById('loginOv').style.display !== 'none') doLogin();
+});
+</script>
+</body>
+</html>

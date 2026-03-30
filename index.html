@@ -1,0 +1,1194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Modern College · Online Exam Portal</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+:root{
+  --blue:#1a73e8;--blue2:#4285f4;--blue-lt:#e8f0fe;--blue-dk:#1557b0;
+  --red:#ea4335;--red-lt:#fce8e6;
+  --green:#34a853;--green-lt:#e6f4ea;
+  --yellow:#fbbc04;--yellow-lt:#fef7e0;
+  --purple:#7c4dff;--orange:#f29900;--teal:#00897b;
+  --bg:#f0f4f8;--white:#fff;--text:#1a1f2e;--text2:#64748b;--border:#e2e8f0;
+  --sh:0 4px 24px rgba(30,41,59,.08),0 1px 4px rgba(30,41,59,.06);
+  --sh2:0 8px 40px rgba(30,41,59,.14),0 2px 8px rgba(30,41,59,.08);
+  --r:14px;
+  --font:'DM Sans',sans-serif;
+  --serif:'Instrument Serif',serif;
+  --mono:'JetBrains Mono',monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:var(--font);background:var(--bg);color:var(--text);overflow-x:hidden;}
+
+/* Pages */
+.pg{display:none!important;}.pg.active{display:flex!important;}
+
+/* Animated bg */
+.bg-mesh{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden;}
+.bg-mesh::before{content:'';position:absolute;width:800px;height:800px;background:radial-gradient(circle,rgba(26,115,232,.08) 0%,transparent 70%);top:-200px;right:-200px;animation:meshMove 12s ease-in-out infinite;}
+.bg-mesh::after{content:'';position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(52,168,83,.06) 0%,transparent 70%);bottom:-100px;left:-100px;animation:meshMove 15s ease-in-out infinite reverse;}
+@keyframes meshMove{0%,100%{transform:translate(0,0) scale(1);}50%{transform:translate(40px,-30px) scale(1.05);}}
+.toast-wrap{position:fixed;bottom:28px;right:28px;z-index:9999;display:flex;flex-direction:column;gap:8px;}
+.toast{display:flex;align-items:center;gap:10px;background:#1e293b;color:#fff;padding:12px 18px;border-radius:12px;font-size:13px;box-shadow:0 4px 20px rgba(0,0,0,.25);animation:tslide .3s ease both;min-width:220px;}
+@keyframes tslide{from{opacity:0;transform:translateX(16px)}to{opacity:1;transform:translateX(0)}}
+.toast i{font-size:15px;flex-shrink:0;}
+.toast.success i{color:#34a853;}.toast.error i{color:#ea4335;}.toast.warn i{color:#fbbc04;}.toast.info i{color:#4f8cff;}
+
+/* ── LOGIN PAGE ── */
+#loginPage{flex-direction:column;min-height:100vh;position:relative;}
+.college-bar{background:linear-gradient(135deg,#1a1f2e,#2d3748);color:#94a3b8;font-size:11.5px;text-align:center;padding:8px 16px;letter-spacing:.03em;position:relative;z-index:10;}
+.college-bar span{color:#e2e8f0;}
+.main-nav{background:rgba(255,255,255,.92);backdrop-filter:blur(12px);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:100;}
+.nav-in{max-width:1140px;margin:0 auto;padding:0 28px;height:66px;display:flex;align-items:center;gap:14px;}
+.brand{display:flex;align-items:center;gap:11px;text-decoration:none;}
+.brand-icon{width:42px;height:42px;border-radius:11px;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;box-shadow:0 3px 10px rgba(26,115,232,.3);}
+.brand-icon i{color:#fff;font-size:16px;}
+.brand-text strong{display:block;font-size:15px;font-weight:600;color:var(--text);}
+.brand-text small{font-size:11px;color:var(--text2);}
+.nav-end{margin-left:auto;display:flex;align-items:center;gap:10px;}
+.nav-badge{background:var(--blue-lt);color:var(--blue);font-size:12px;font-weight:600;padding:6px 14px;border-radius:100px;border:1px solid rgba(26,115,232,.2);}
+
+.hero{flex:1;display:flex;align-items:center;padding:60px 28px;position:relative;z-index:2;}
+.hero-in{max-width:1140px;margin:0 auto;display:grid;grid-template-columns:1fr 420px;gap:64px;align-items:center;width:100%;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:7px;background:#e6f4ea;color:var(--green);font-size:12px;font-weight:600;padding:5px 13px;border-radius:100px;margin-bottom:20px;border:1px solid rgba(52,168,83,.2);}
+.live-dot{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s ease infinite;}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(52,168,83,.4);}70%{opacity:.8;box-shadow:0 0 0 6px rgba(52,168,83,0);}}
+.hero h1{font-family:var(--serif);font-size:clamp(36px,4vw,56px);font-weight:400;line-height:1.1;color:var(--text);margin-bottom:16px;letter-spacing:-.02em;}
+.hero h1 em{font-style:italic;color:var(--blue);}
+.hero-sub{font-size:16px;color:var(--text2);line-height:1.7;max-width:480px;margin-bottom:40px;}
+.feature-pills{display:flex;flex-wrap:wrap;gap:10px;}
+.fpill{display:flex;align-items:center;gap:8px;padding:9px 16px;border-radius:100px;font-size:13px;font-weight:500;border:1.5px solid;}
+.fpill.b{color:var(--blue);border-color:rgba(26,115,232,.25);background:var(--blue-lt);}
+.fpill.g{color:var(--green);border-color:rgba(52,168,83,.25);background:var(--green-lt);}
+.fpill.r{color:var(--red);border-color:rgba(234,67,53,.25);background:var(--red-lt);}
+.fpill.y{color:#92610a;border-color:rgba(251,188,4,.3);background:var(--yellow-lt);}
+
+/* Auth Card */
+.auth-card{background:var(--white);border-radius:20px;box-shadow:var(--sh2);padding:36px 32px;border:1px solid var(--border);animation:slideUp .4s ease both;}
+@keyframes slideUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+.auth-hd h2{font-size:22px;font-weight:600;color:var(--text);margin-bottom:4px;}
+.auth-hd p{font-size:13.5px;color:var(--text2);margin-bottom:22px;}
+.token-row{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,var(--blue-lt),var(--green-lt));border:1.5px solid rgba(26,115,232,.2);border-radius:12px;padding:12px 16px;margin-bottom:24px;}
+.token-row i{color:var(--blue);font-size:16px;}
+.token-row .label{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;}
+.token-row .val{font-family:var(--mono);font-size:15px;font-weight:500;color:var(--blue);}
+.fg{margin-bottom:18px;position:relative;}
+.fg label{display:block;font-size:11.5px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:7px;}
+.fg input{width:100%;padding:12px 14px 12px 42px;border:1.5px solid var(--border);border-radius:11px;font-family:var(--font);font-size:14px;color:var(--text);background:#fafbfc;outline:none;transition:all .18s;}
+.fg input:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,115,232,.1);}
+.fg .icon{position:absolute;left:14px;bottom:13px;color:#cbd5e1;font-size:14px;transition:color .18s;pointer-events:none;}
+.fg input:focus~.icon{color:var(--blue);}
+.btn-login{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--blue2));color:#fff;border:none;border-radius:11px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 3px 12px rgba(26,115,232,.3);}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(26,115,232,.35);}
+.auth-hint{margin-top:14px;background:var(--yellow-lt);border:1px solid rgba(251,188,4,.25);border-radius:9px;padding:10px 14px;font-size:12.5px;color:#7a5100;display:flex;gap:8px;align-items:flex-start;}
+
+/* ── CAMERA PERM ── */
+#camPage{flex-direction:column;min-height:100vh;align-items:center;justify-content:center;position:relative;z-index:2;padding:24px;}
+.cam-card{background:var(--white);border-radius:22px;box-shadow:var(--sh2);padding:40px 36px;max-width:520px;width:100%;border:1px solid var(--border);animation:slideUp .4s ease both;}
+.cam-icon{width:68px;height:68px;border-radius:18px;background:linear-gradient(135deg,var(--blue-lt),var(--green-lt));border:2px solid rgba(26,115,232,.15);display:flex;align-items:center;justify-content:center;font-size:28px;margin:0 auto 22px;}
+.cam-title{font-size:22px;font-weight:600;text-align:center;margin-bottom:8px;}
+.cam-sub{font-size:14px;color:var(--text2);text-align:center;line-height:1.7;margin-bottom:28px;}
+.perm-list{display:flex;flex-direction:column;gap:12px;margin-bottom:28px;}
+.perm-item{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--border);border-radius:12px;background:#fafbfc;}
+.perm-icon{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;}
+.perm-icon.cam{background:var(--blue-lt);color:var(--blue);}
+.perm-icon.mic{background:var(--green-lt);color:var(--green);}
+.perm-text strong{display:block;font-size:13.5px;font-weight:600;margin-bottom:2px;}
+.perm-text p{font-size:12px;color:var(--text2);}
+.perm-badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;margin-left:auto;white-space:nowrap;}
+.perm-badge.wait{background:var(--yellow-lt);color:#92610a;}
+.perm-badge.ok{background:var(--green-lt);color:var(--green);}
+.perm-badge.no{background:var(--red-lt);color:var(--red);}
+.btn-perm{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;border:none;border-radius:12px;font-family:var(--font);font-size:15px;font-weight:600;cursor:pointer;transition:all .18s;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 3px 12px rgba(26,115,232,.3);}
+.btn-perm:hover{transform:translateY(-2px);}
+.btn-perm:disabled{background:#94a3b8;box-shadow:none;cursor:not-allowed;transform:none;}
+
+/* ── PHOTO PAGE ── */
+#photoPage{flex-direction:column;min-height:100vh;align-items:center;justify-content:center;position:relative;z-index:2;padding:24px;}
+.photo-card{background:var(--white);border-radius:22px;box-shadow:var(--sh2);padding:36px;max-width:500px;width:100%;border:1px solid var(--border);animation:slideUp .4s ease both;}
+.photo-title{font-size:20px;font-weight:600;display:flex;align-items:center;gap:10px;margin-bottom:6px;}
+.photo-sub{font-size:13px;color:var(--text2);margin-bottom:22px;line-height:1.6;}
+.cam-vp{position:relative;border-radius:16px;overflow:hidden;background:#0f172a;aspect-ratio:4/3;margin-bottom:16px;border:3px solid var(--border);}
+.cam-vp video,.cam-vp canvas{width:100%;height:100%;object-fit:cover;display:block;}
+.cam-vp canvas{position:absolute;inset:0;display:none;}
+.face-ring{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;}
+.face-ring div{width:170px;height:170px;border-radius:50%;border:3px dashed rgba(26,115,232,.5);animation:ring 2s ease infinite;}
+@keyframes ring{0%,100%{transform:scale(1);border-color:rgba(26,115,232,.4);}50%{transform:scale(1.04);border-color:rgba(26,115,232,.8);}}
+.cam-vp.captured{border-color:var(--green);}
+.photo-btns{display:flex;gap:10px;}
+.btn-capture{flex:1;padding:12px;background:var(--blue);color:#fff;border:none;border-radius:11px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;transition:all .18s;box-shadow:0 2px 8px rgba(26,115,232,.25);}
+.btn-capture:hover{background:var(--blue-dk);}
+.btn-retake{padding:12px 18px;background:#f8fafc;color:var(--text2);border:1.5px solid var(--border);border-radius:11px;font-family:var(--font);font-size:14px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .18s;}
+.btn-retake:hover{border-color:var(--red);color:var(--red);}
+.btn-proceed{width:100%;margin-top:12px;padding:12px;background:var(--green);color:#fff;border:none;border-radius:11px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;display:none;align-items:center;justify-content:center;gap:8px;transition:all .18s;}
+.photo-ok{display:none;align-items:center;gap:10px;background:var(--green-lt);border:1px solid rgba(52,168,83,.25);border-radius:10px;padding:11px 14px;margin-top:12px;font-size:13px;font-weight:600;color:var(--green);}
+
+/* ── EXAM PAGE ── */
+#examPage{flex-direction:column;height:100vh;overflow:hidden;}
+.exam-nav{background:var(--white);border-bottom:2px solid var(--border);height:58px;display:flex;align-items:center;gap:12px;padding:0 20px;flex-shrink:0;box-shadow:0 2px 8px rgba(30,41,59,.08);z-index:50;}
+.exam-brand{display:flex;align-items:center;gap:9px;}
+.exam-brand .eb-icon{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue),var(--teal));display:flex;align-items:center;justify-content:center;}
+.exam-brand .eb-icon i{color:#fff;font-size:13px;}
+.exam-brand strong{font-size:14px;font-weight:600;}
+.exam-brand small{font-size:11px;color:var(--text2);display:block;}
+.exam-chip{background:var(--blue-lt);border:1px solid rgba(26,115,232,.2);color:var(--blue);font-size:12px;font-weight:600;padding:5px 13px;border-radius:100px;}
+.nav-sp{flex:1;}
+.timer-box{display:flex;align-items:center;gap:8px;background:#fff3e0;border:2px solid rgba(242,153,0,.3);border-radius:10px;padding:7px 16px;font-family:var(--mono);font-size:15px;font-weight:500;color:#92610a;min-width:105px;justify-content:center;}
+.timer-box.danger{background:var(--red-lt);border-color:rgba(234,67,53,.3);color:var(--red);animation:blink 1s ease infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.5}}
+.cam-mini{position:relative;}
+.cam-mini-vid{width:68px;height:50px;border-radius:9px;overflow:hidden;border:2.5px solid var(--green);}
+.cam-mini-vid video{width:100%;height:100%;object-fit:cover;}
+.cam-dot-live{position:absolute;top:-3px;right:-3px;width:11px;height:11px;border-radius:50%;background:var(--green);border:2px solid #fff;animation:livepulse 2s infinite;}
+@keyframes livepulse{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.5);opacity:.5}}
+.btn-draft{display:flex;align-items:center;gap:7px;padding:7px 15px;background:var(--blue-lt);color:var(--blue);border:1.5px solid rgba(26,115,232,.25);border-radius:9px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;}
+.btn-draft:hover,.btn-draft.saved{background:var(--green-lt);color:var(--green);border-color:rgba(52,168,83,.3);}
+.btn-submit-nav{display:flex;align-items:center;gap:7px;padding:7px 16px;background:var(--green);color:#fff;border:none;border-radius:9px;font-family:var(--font);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;box-shadow:0 2px 8px rgba(52,168,83,.25);}
+.btn-submit-nav:hover{background:#2d9348;}
+
+/* Warning Banner */
+.warn-banner{display:none;position:fixed;top:66px;left:50%;transform:translateX(-50%);z-index:200;background:var(--red);color:#fff;padding:10px 24px 10px 16px;border-radius:10px;box-shadow:0 4px 20px rgba(234,67,53,.4);font-size:13.5px;font-weight:600;align-items:center;gap:10px;animation:warnPop .3s ease both;max-width:500px;}
+@keyframes warnPop{from{opacity:0;transform:translateX(-50%) translateY(-10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+.warn-banner.show{display:flex;}
+.warn-close{margin-left:auto;background:none;border:none;color:#fff;cursor:pointer;font-size:16px;padding:0 0 0 8px;}
+
+/* Exam Body */
+.exam-body{flex:1;display:flex;overflow:hidden;}
+.palette{width:200px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;}
+.palette-hd{padding:12px 14px;border-bottom:1px solid var(--border);background:#f8fafc;}
+.palette-title{font-size:11px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.palette-legend{display:flex;flex-wrap:wrap;gap:6px;}
+.leg{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--text2);}
+.leg-dot{width:10px;height:10px;border-radius:3px;}
+.leg-dot.ans{background:var(--green);}
+.leg-dot.cur{background:var(--blue);}
+.leg-dot.emp{background:#e2e8f0;border:1px solid #cbd5e1;}
+.leg-dot.flg{background:var(--orange);}
+.sec-tabs{display:flex;gap:4px;padding:8px 10px;border-bottom:1px solid var(--border);flex-wrap:wrap;}
+.sec-tab{padding:4px 10px;border-radius:100px;font-size:11px;font-weight:600;border:1.5px solid var(--border);background:#fff;color:var(--text2);cursor:pointer;transition:all .15s;}
+.sec-tab.active{background:var(--blue);border-color:var(--blue);color:#fff;}
+.qgrid{flex:1;overflow-y:auto;padding:10px;}
+.qgrid::-webkit-scrollbar{width:3px;}
+.qgrid::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+.sec-group{margin-bottom:12px;}
+.sec-group-label{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:4px 2px 6px;display:flex;justify-content:space-between;}
+.sec-group-label span{background:#f1f5f9;border-radius:100px;padding:1px 7px;font-size:9px;color:var(--text2);}
+.qnums{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;}
+.qn{aspect-ratio:1;border-radius:7px;border:1.5px solid var(--border);background:#f8fafc;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:var(--text2);cursor:pointer;transition:all .15s;}
+.qn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-lt);}
+.qn.cur{background:var(--blue);border-color:var(--blue);color:#fff;}
+.qn.ans{background:var(--green);border-color:var(--green);color:#fff;}
+.qn.flg{background:var(--orange);border-color:var(--orange);color:#fff;}
+
+/* Center */
+.q-center{flex:1;display:flex;flex-direction:column;overflow:hidden;background:var(--bg);}
+.q-scroll{flex:1;overflow-y:auto;padding:24px 28px;}
+.q-scroll::-webkit-scrollbar{width:5px;}
+.q-scroll::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px;}
+.sec-crumb{display:flex;align-items:center;gap:8px;font-size:13px;margin-bottom:14px;flex-wrap:wrap;}
+.crumb-sec{font-weight:700;padding:4px 12px;border-radius:100px;border:1px solid;}
+.crumb-sep{color:var(--text2);}
+.crumb-info{color:var(--text2);}
+.q-card{background:var(--white);border:1px solid var(--border);border-radius:16px;padding:28px 32px;box-shadow:0 2px 10px rgba(30,41,59,.06);margin-bottom:20px;}
+.q-meta{display:flex;align-items:center;gap:10px;margin-bottom:18px;padding-bottom:14px;border-bottom:1px solid var(--border);}
+.q-num-badge{color:#fff;border-radius:9px;padding:5px 13px;font-size:13px;font-weight:700;}
+.q-marks-badge{background:var(--green-lt);color:var(--green);border-radius:100px;padding:4px 12px;font-size:12px;font-weight:600;}
+.q-type-badge{background:#f3e8ff;color:var(--purple);border-radius:100px;padding:4px 12px;font-size:12px;font-weight:600;}
+.q-flag-btn{margin-left:auto;background:transparent;border:1.5px solid var(--border);border-radius:8px;width:33px;height:33px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .15s;color:var(--text2);}
+.q-flag-btn:hover,.q-flag-btn.on{background:var(--yellow-lt);border-color:rgba(251,188,4,.4);color:var(--orange);}
+.q-text{font-size:16px;font-weight:500;color:var(--text);line-height:1.7;margin-bottom:22px;}
+.opts{display:flex;flex-direction:column;gap:10px;}
+.opt{display:flex;align-items:center;gap:14px;padding:13px 18px;border:2px solid var(--border);border-radius:12px;cursor:pointer;transition:all .18s;background:#fff;}
+.opt:hover{border-color:var(--blue);background:var(--blue-lt);}
+.opt.sel{border-color:var(--green);background:var(--green-lt);}
+.opt-lt{width:32px;height:32px;border-radius:8px;background:#f1f5f9;color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;transition:all .18s;}
+.opt.sel .opt-lt{background:var(--green);color:#fff;}
+.opt:hover:not(.sel) .opt-lt{background:var(--blue);color:#fff;}
+.fill-in{width:100%;padding:12px 16px;border:2px solid var(--border);border-radius:11px;font-family:var(--font);font-size:14px;color:var(--text);outline:none;transition:all .15s;background:#fafbfc;}
+.fill-in:focus{border-color:var(--blue);background:#fff;box-shadow:0 0 0 3px rgba(26,115,232,.1);}
+.qnav-bar{padding:14px 28px;border-top:1px solid var(--border);background:#fff;display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.qnav-btn{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:10px;border:1.5px solid var(--border);background:#fff;color:var(--text2);font-family:var(--font);font-size:13.5px;font-weight:600;cursor:pointer;transition:all .18s;}
+.qnav-btn:hover{border-color:var(--blue);color:var(--blue);background:var(--blue-lt);}
+.qnav-btn:disabled{opacity:.4;cursor:not-allowed;}
+.qnav-btn.primary{background:var(--blue);color:#fff;border-color:var(--blue);}
+.qnav-btn.primary:hover{background:var(--blue-dk);}
+.qnav-btn.finish{background:var(--green);color:#fff;border-color:var(--green);}
+.qnav-btn.finish:hover{background:#2d9348;}
+.qnav-info{flex:1;text-align:center;font-size:12.5px;color:var(--text2);}
+.qnav-info strong{color:var(--text);}
+
+/* Sidebar */
+.q-sidebar{width:250px;flex-shrink:0;background:#fff;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow-y:auto;}
+.q-sidebar::-webkit-scrollbar{width:4px;}
+.q-sidebar::-webkit-scrollbar-thumb{background:var(--border);}
+.sb-section{border-bottom:1px solid var(--border);}
+.sb-head{display:flex;align-items:center;gap:9px;padding:13px 16px;cursor:pointer;background:#f8fafc;transition:background .15s;}
+.sb-head:hover{background:var(--blue-lt);}
+.sb-head i.ico{font-size:13px;color:var(--blue);}
+.sb-head span{font-size:13px;font-weight:600;flex:1;}
+.sb-head .chev{font-size:11px;color:var(--text2);transition:transform .2s;}
+.sb-head.open .chev{transform:rotate(180deg);}
+.sb-body{display:none;padding:14px 16px;}
+.sb-body.open{display:block;}
+.prog-item{margin-bottom:12px;}
+.prog-label{display:flex;justify-content:space-between;margin-bottom:5px;font-size:12px;}
+.prog-label span:first-child{font-weight:600;color:var(--text);}
+.prog-label span:last-child{color:var(--text2);}
+.prog-bar{height:6px;background:#e2e8f0;border-radius:100px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:100px;transition:width .4s;}
+.mini-stats{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:10px;}
+.ms{padding:8px;border-radius:8px;text-align:center;}
+.ms .n{font-size:18px;font-weight:700;font-family:var(--mono);}
+.ms .l{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.04em;margin-top:2px;}
+.ms.a{background:var(--green-lt);}.ms.a .n{color:var(--green);}
+.ms.u{background:var(--yellow-lt);}.ms.u .n{color:#92610a;}
+.ms.f{background:#fff3e0;}.ms.f .n{color:var(--orange);}
+.ms.t{background:var(--blue-lt);}.ms.t .n{color:var(--blue);}
+.calc{background:#0f172a;border-radius:12px;overflow:hidden;}
+.calc-disp{padding:14px 16px 10px;background:#0a0f1e;text-align:right;}
+.calc-expr{font-size:11px;color:rgba(255,255,255,.3);min-height:14px;font-family:var(--mono);}
+.calc-val{font-size:24px;font-weight:500;color:#fff;font-family:var(--mono);word-break:break-all;}
+.calc-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;background:rgba(255,255,255,.05);}
+.cb{padding:12px 6px;text-align:center;font-family:var(--mono);font-size:14px;font-weight:500;cursor:pointer;background:#1e293b;color:rgba(255,255,255,.85);border:none;transition:background .12s;}
+.cb:hover{background:#2d3f55;}
+.cb.op{color:#4ade80;}
+.cb.eq{background:var(--blue);color:#fff;grid-column:span 2;}
+.cb.eq:hover{background:var(--blue-dk);}
+.cb.cl{color:#f87171;}
+.cb.z{grid-column:span 2;}
+.sec-nav-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px solid #f1f5f9;cursor:pointer;transition:background .15s;}
+.sec-nav-item:hover,.sec-nav-item.act{background:var(--blue-lt);}
+.sec-nav-icon{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;}
+.sec-nav-name{font-size:13px;font-weight:600;flex:1;}
+.sec-nav-meta{font-size:11px;color:var(--text2);}
+.notes-ta{width:100%;padding:10px 12px;min-height:100px;resize:none;border:1.5px solid var(--border);border-radius:9px;font-family:var(--font);font-size:12.5px;color:var(--text);outline:none;transition:border-color .15s;background:#fafbfc;}
+.notes-ta:focus{border-color:var(--blue);background:#fff;}
+
+/* ── REVIEW PAGE ── */
+#reviewPage{flex-direction:column;height:100vh;overflow:hidden;}
+.rev-nav{background:#fff;border-bottom:2px solid var(--border);height:58px;display:flex;align-items:center;gap:12px;padding:0 24px;flex-shrink:0;box-shadow:0 2px 8px rgba(30,41,59,.08);}
+.rev-title{font-size:16px;font-weight:600;flex:1;}
+.rev-sub{font-size:12px;color:var(--text2);}
+.rev-body{flex:1;overflow-y:auto;padding:24px 28px;}
+.rev-sec{margin-bottom:28px;}
+.rev-sec-title{font-size:14px;font-weight:700;display:flex;align-items:center;gap:8px;padding:10px 16px;border-radius:10px;margin-bottom:12px;}
+.rev-grid{display:flex;flex-direction:column;gap:10px;}
+.rev-q{background:#fff;border:1.5px solid var(--border);border-radius:12px;padding:16px 20px;cursor:pointer;transition:all .18s;}
+.rev-q:hover{border-color:var(--blue);box-shadow:0 2px 8px rgba(26,115,232,.1);}
+.rev-q.answered{border-color:rgba(52,168,83,.3);background:#fafffe;}
+.rev-q.skipped{border-color:rgba(251,188,4,.3);background:#fffdf5;}
+.rev-qhd{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
+.rev-qnum{font-size:12px;font-weight:700;color:#fff;padding:3px 10px;border-radius:6px;}
+.rev-stat{font-size:11px;font-weight:600;padding:3px 10px;border-radius:100px;}
+.rev-stat.a{background:var(--green-lt);color:var(--green);}
+.rev-stat.s{background:var(--yellow-lt);color:#92610a;}
+.rev-stat.f{background:#fff3e0;color:var(--orange);}
+.rev-qtext{font-size:13.5px;font-weight:500;color:var(--text);line-height:1.5;margin-bottom:6px;}
+.rev-ans{font-size:12.5px;font-weight:600;display:flex;align-items:center;gap:6px;}
+.rev-ans.a{color:var(--green);}
+.rev-ans.s{color:#92610a;}
+.rev-edit{margin-left:auto;font-size:11.5px;color:var(--blue);font-weight:600;}
+.rev-footer{padding:14px 28px;border-top:2px solid var(--border);background:linear-gradient(135deg,#f0fff6,#f0f4ff);display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.rev-stats{display:flex;gap:14px;}
+.rv-s{display:flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;}
+.rv-dot{width:8px;height:8px;border-radius:50%;}
+
+/* ── RESULT PAGE ── */
+#resultPage{flex-direction:column;min-height:100vh;align-items:center;justify-content:center;background:linear-gradient(135deg,#e8f0fe,#e6f4ea);position:relative;z-index:2;padding:40px 24px;}
+.result-card{background:#fff;border-radius:24px;padding:48px 40px;box-shadow:var(--sh2);max-width:500px;width:100%;text-align:center;animation:slideUp .5s ease both;}
+.result-photo{width:64px;height:64px;border-radius:50%;border:3px solid var(--green);object-fit:cover;margin:0 auto 18px;display:block;}
+.result-icon{width:76px;height:76px;border-radius:50%;background:var(--green-lt);border:3px solid var(--green);display:flex;align-items:center;justify-content:center;font-size:34px;margin:0 auto 18px;}
+.result-title{font-family:var(--serif);font-size:28px;margin-bottom:6px;}
+.result-sub{font-size:14px;color:var(--text2);margin-bottom:22px;}
+.result-score{font-family:var(--mono);font-size:56px;font-weight:500;color:var(--green);line-height:1;}
+.result-of{font-size:16px;color:var(--text2);margin:4px 0 28px;}
+.result-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:28px;}
+.rg{padding:14px;border-radius:12px;}.rg .n{font-size:22px;font-weight:700;font-family:var(--mono);}.rg .l{font-size:11px;color:var(--text2);margin-top:3px;}
+.rg.g{background:var(--green-lt);}.rg.g .n{color:var(--green);}
+.rg.r{background:var(--red-lt);}.rg.r .n{color:var(--red);}
+.rg.b{background:var(--blue-lt);}.rg.b .n{color:var(--blue);}
+.btn-back{width:100%;padding:13px;background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;border:none;border-radius:11px;font-family:var(--font);font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;}
+
+/* Modal */
+.modal-ov{position:fixed;inset:0;background:rgba(15,23,42,.6);backdrop-filter:blur(6px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-ov.open{display:flex;}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(15,23,42,.2);animation:mIn .25s ease both;}
+@keyframes mIn{from{opacity:0;transform:scale(.95) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mhd{padding:22px 24px 16px;border-bottom:1px solid var(--border);background:linear-gradient(135deg,var(--green-lt),var(--blue-lt));border-radius:20px 20px 0 0;display:flex;align-items:center;gap:12px;}
+.mhd-icon{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;background:var(--green-lt);}
+.mhd-title{font-size:17px;font-weight:600;}
+.mhd-sub{font-size:12px;color:var(--text2);margin-top:2px;}
+.mbody{padding:22px 24px;}
+.mstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px;}
+.mst{text-align:center;padding:12px;border-radius:10px;}
+.mst .n{font-size:22px;font-weight:700;font-family:var(--mono);}
+.mst .l{font-size:11px;color:var(--text2);margin-top:2px;}
+.mst.g{background:var(--green-lt);}.mst.g .n{color:var(--green);}
+.mst.y{background:var(--yellow-lt);}.mst.y .n{color:#92610a;}
+.mst.r{background:var(--red-lt);}.mst.r .n{color:var(--red);}
+.mwarn{background:var(--yellow-lt);border:1px solid rgba(251,188,4,.25);border-radius:9px;padding:11px 14px;font-size:12.5px;color:#7a5100;display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+.mfooter{padding:14px 24px;border-top:1px solid var(--border);display:flex;justify-content:flex-end;gap:10px;border-radius:0 0 20px 20px;}
+.mbtn{display:flex;align-items:center;gap:7px;padding:10px 20px;border-radius:9px;font-family:var(--font);font-size:13.5px;font-weight:600;cursor:pointer;border:none;transition:all .15s;}
+.mbtn.ghost{background:transparent;color:var(--text2);border:1.5px solid var(--border);}
+.mbtn.ghost:hover{background:#f8fafc;}
+.mbtn.review{background:var(--blue);color:#fff;}
+.mbtn.submit{background:var(--green);color:#fff;}
+
+@media(max-width:900px){
+  .hero-in{grid-template-columns:1fr;}.auth-card{max-width:440px;}
+  .palette,.q-sidebar{display:none;}
+}
+</style>
+</head>
+<body>
+<div class="bg-mesh"></div>
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- Warning Banner -->
+<div class="warn-banner" id="warnBanner">
+  <i class="fas fa-triangle-exclamation"></i>
+  <span id="warnMsg">Warning from proctor</span>
+  <button class="warn-close" onclick="dismissWarning()">✕</button>
+</div>
+
+<!-- ════ PAGE 1: LOGIN ════ -->
+<div id="loginPage" class="pg active">
+  <div class="college-bar">Progressive Education Society's · <span>Modern College of Arts, Science &amp; Commerce (Autonomous)</span> · Ganeshkhind, Pune</div>
+  <nav class="main-nav">
+    <div class="nav-in">
+      <a class="brand" href="#">
+        <div class="brand-icon"><i class="fas fa-shield-alt"></i></div>
+        <div class="brand-text"><strong>Modern College</strong><small>Ganeshkhind, Pune</small></div>
+      </a>
+      <div class="nav-end">
+        <div class="nav-badge"><i class="fas fa-graduation-cap"></i> Online Exam Portal</div>
+      </div>
+    </div>
+  </nav>
+  <section class="hero">
+    <div class="hero-in">
+      <div>
+        <div class="hero-eyebrow"><span class="live-dot"></span> Exam System Active</div>
+        <h1>Online <em>Proctored</em><br>Examination Portal</h1>
+        <p class="hero-sub">Appear for your exams securely. AI-powered proctoring, encrypted sessions, and instant results — built for Modern College students.</p>
+        <div class="feature-pills">
+          <div class="fpill b"><i class="fas fa-eye"></i> AI Proctored</div>
+          <div class="fpill g"><i class="fas fa-lock"></i> Secure Sessions</div>
+          <div class="fpill r"><i class="fas fa-clock"></i> Timed Exam</div>
+          <div class="fpill y"><i class="fas fa-chart-bar"></i> Instant Results</div>
+        </div>
+      </div>
+      <div class="auth-card">
+        <div class="auth-hd"><h2>Student Login</h2><p>Enter your credentials to access the exam</p></div>
+        <div class="token-row">
+          <i class="fas fa-key"></i>
+          <div><div class="label">Access Token</div><div class="val">MCT-XXJFB-1W6Y7</div></div>
+        </div>
+        <div class="fg">
+          <label>Full Name</label>
+          <input type="text" id="loginName" placeholder="Enter your full name">
+          <i class="fas fa-user icon"></i>
+        </div>
+        <div class="fg">
+          <label>Date of Birth</label>
+          <input type="password" id="loginDob" placeholder="DD/MM/YYYY">
+          <i class="fas fa-calendar-alt icon"></i>
+        </div>
+        <div class="fg">
+          <label>Exam Access Token</label>
+          <input type="text" id="loginToken" value="MCT-XXJFB-1W6Y7" placeholder="MCT-XXJFB-1W6Y7">
+          <i class="fas fa-key icon"></i>
+        </div>
+        <button class="btn-login" onclick="doLogin()"><i class="fas fa-arrow-right"></i> Continue to Verification</button>
+        <div class="auth-hint"><i class="fas fa-info-circle"></i><span>Camera &amp; microphone access required for AI proctoring in the next step.</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ════ PAGE 2: CAMERA PERMISSION ════ -->
+<div id="camPage" class="pg">
+  <div class="cam-card">
+    <div class="cam-icon">📷</div>
+    <div class="cam-title">Camera &amp; Microphone Access</div>
+    <div class="cam-sub">This exam uses AI-based proctoring. Your camera and microphone must remain active throughout the exam.</div>
+    <div class="perm-list">
+      <div class="perm-item">
+        <div class="perm-icon cam"><i class="fas fa-camera"></i></div>
+        <div class="perm-text"><strong>Camera Access</strong><p>Face monitoring and identity verification during exam.</p></div>
+        <span class="perm-badge wait" id="camBadge">Waiting</span>
+      </div>
+      <div class="perm-item">
+        <div class="perm-icon mic"><i class="fas fa-microphone"></i></div>
+        <div class="perm-text"><strong>Microphone Access</strong><p>Audio monitoring to detect external communication.</p></div>
+        <span class="perm-badge wait" id="micBadge">Waiting</span>
+      </div>
+    </div>
+    <button class="btn-perm" id="permBtn" onclick="requestPermissions()">
+      <i class="fas fa-shield-alt"></i> Grant Access &amp; Continue
+    </button>
+    <p style="margin-top:12px;font-size:11.5px;color:var(--text2);text-align:center;line-height:1.6;">
+      <i class="fas fa-lock" style="color:var(--green);margin-right:4px;"></i>
+      Your video is used only for proctoring — not stored externally.
+    </p>
+  </div>
+</div>
+
+<!-- ════ PAGE 3: PHOTO CAPTURE ════ -->
+<div id="photoPage" class="pg">
+  <div class="photo-card">
+    <div class="photo-title"><i class="fas fa-id-badge" style="color:var(--blue);"></i> Identity Verification</div>
+    <div class="photo-sub">Look directly at the camera. This photo will be stored with your exam submission for verification.</div>
+    <div class="cam-vp" id="camVp">
+      <video id="photoVid" autoplay muted playsinline></video>
+      <canvas id="photoCanvas"></canvas>
+      <div class="face-ring"><div></div></div>
+    </div>
+    <div style="font-size:12px;color:var(--text2);text-align:center;margin-bottom:14px;display:flex;align-items:center;gap:6px;justify-content:center;" id="camGuide">
+      <i class="fas fa-circle-info" style="color:var(--blue);"></i> Position your face within the circle
+    </div>
+    <div class="photo-btns">
+      <button class="btn-capture" id="captureBtn" onclick="capturePhoto()"><i class="fas fa-camera"></i> Capture Photo</button>
+      <button class="btn-retake" id="retakeBtn" onclick="retakePhoto()" style="display:none;"><i class="fas fa-redo"></i> Retake</button>
+    </div>
+    <div class="photo-ok" id="photoOk"><i class="fas fa-circle-check"></i><div><div style="font-size:13px;font-weight:700;">Photo saved</div><div style="font-size:11px;color:var(--text2);">Stored securely with your submission</div></div></div>
+    <button class="btn-proceed" id="proceedBtn" onclick="proceedToExam()"><i class="fas fa-check-circle"></i> Proceed to Exam</button>
+  </div>
+</div>
+
+<!-- ════ PAGE 4: EXAM ════ -->
+<div id="examPage" class="pg">
+  <div class="exam-nav">
+    <div class="exam-brand">
+      <div class="eb-icon"><i class="fas fa-shield-alt"></i></div>
+      <div><strong>Modern College</strong><small>Exam Portal</small></div>
+    </div>
+    <div class="exam-chip" id="navExamName">Loading…</div>
+    <div class="nav-sp"></div>
+    <div class="timer-box" id="timerBox"><i class="fas fa-clock"></i><span id="timerDisp">60:00</span></div>
+    <div class="cam-mini">
+      <div class="cam-mini-vid"><video id="examVid" autoplay muted playsinline></video></div>
+      <div class="cam-dot-live"></div>
+    </div>
+    <button class="btn-draft" id="draftBtn" onclick="saveDraft()"><i class="fas fa-save"></i> Save Draft</button>
+    <button class="btn-submit-nav" onclick="openSubmitModal()"><i class="fas fa-paper-plane"></i> Submit</button>
+  </div>
+
+  <div class="exam-body">
+    <!-- Left palette -->
+    <div class="palette">
+      <div class="palette-hd">
+        <div class="palette-title">Questions</div>
+        <div class="palette-legend">
+          <div class="leg"><div class="leg-dot ans"></div>Done</div>
+          <div class="leg"><div class="leg-dot cur"></div>Now</div>
+          <div class="leg"><div class="leg-dot emp"></div>Left</div>
+          <div class="leg"><div class="leg-dot flg"></div>Flag</div>
+        </div>
+      </div>
+      <div class="sec-tabs" id="secTabs"></div>
+      <div class="qgrid" id="qgrid"></div>
+    </div>
+
+    <!-- Center -->
+    <div class="q-center">
+      <div class="q-scroll" id="qScroll">
+        <div id="qCrumb" class="sec-crumb"></div>
+        <div id="qContainer"></div>
+      </div>
+      <div class="qnav-bar">
+        <button class="qnav-btn" id="prevBtn" onclick="prevQ()"><i class="fas fa-chevron-left"></i> Previous</button>
+        <div class="qnav-info"><strong id="qNavLabel">Q1 of 15</strong><br><span id="qNavSub">Select an answer</span></div>
+        <button class="qnav-btn primary" id="nextBtn" onclick="nextQ()">Next <i class="fas fa-chevron-right"></i></button>
+        <button class="qnav-btn finish" id="finishBtn" style="display:none;" onclick="openSubmitModal()"><i class="fas fa-paper-plane"></i> Submit Exam</button>
+      </div>
+    </div>
+
+    <!-- Right sidebar -->
+    <div class="q-sidebar">
+      <div class="sb-section">
+        <div class="sb-head open" onclick="toggleSB(this)"><i class="fas fa-chart-pie ico"></i><span>Progress</span><i class="fas fa-chevron-down chev"></i></div>
+        <div class="sb-body open" id="sbProgress"></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-head" onclick="toggleSB(this)"><i class="fas fa-layer-group ico"></i><span>Sections</span><i class="fas fa-chevron-down chev"></i></div>
+        <div class="sb-body" id="sbSections"></div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-head" onclick="toggleSB(this)"><i class="fas fa-calculator ico"></i><span>Calculator</span><i class="fas fa-chevron-down chev"></i></div>
+        <div class="sb-body" id="sbCalc">
+          <div class="calc">
+            <div class="calc-disp"><div class="calc-expr" id="cExpr"></div><div class="calc-val" id="cVal">0</div></div>
+            <div class="calc-grid">
+              <button class="cb cl" onclick="ca('C')">C</button><button class="cb op" onclick="ca('±')">±</button><button class="cb op" onclick="ca('%')">%</button><button class="cb op" onclick="ca('/')">÷</button>
+              <button class="cb" onclick="ca('7')">7</button><button class="cb" onclick="ca('8')">8</button><button class="cb" onclick="ca('9')">9</button><button class="cb op" onclick="ca('*')">×</button>
+              <button class="cb" onclick="ca('4')">4</button><button class="cb" onclick="ca('5')">5</button><button class="cb" onclick="ca('6')">6</button><button class="cb op" onclick="ca('-')">−</button>
+              <button class="cb" onclick="ca('1')">1</button><button class="cb" onclick="ca('2')">2</button><button class="cb" onclick="ca('3')">3</button><button class="cb op" onclick="ca('+')">+</button>
+              <button class="cb z" onclick="ca('0')">0</button><button class="cb" onclick="ca('.')">.</button><button class="cb eq" onclick="ca('=')">=</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="sb-section">
+        <div class="sb-head" onclick="toggleSB(this)"><i class="fas fa-sticky-note ico"></i><span>Notes</span><i class="fas fa-chevron-down chev"></i></div>
+        <div class="sb-body" id="sbNotes"><textarea class="notes-ta" id="notes" placeholder="Scratch notes (not submitted)…"></textarea></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════ PAGE 5: REVIEW ════ -->
+<div id="reviewPage" class="pg">
+  <div class="rev-nav">
+    <div class="exam-brand" style="margin-right:12px;">
+      <div class="eb-icon"><i class="fas fa-shield-alt"></i></div>
+      <div><strong>Modern College</strong><small>Review Answers</small></div>
+    </div>
+    <div><div class="rev-title">Review Your Answers</div><div class="rev-sub">Click any question to edit your answer</div></div>
+    <div style="flex:1;"></div>
+    <div class="rev-stats" id="revStats"></div>
+  </div>
+  <div class="rev-body" id="revBody"></div>
+  <div class="rev-footer">
+    <div style="flex:1;font-size:12.5px;color:var(--text2);display:flex;align-items:center;gap:6px;"><i class="fas fa-circle-info" style="color:var(--green);"></i> Click any question to change your answer.</div>
+    <button class="qnav-btn" onclick="backToExam()"><i class="fas fa-arrow-left"></i> Back</button>
+    <button class="qnav-btn finish" onclick="submitExam()"><i class="fas fa-paper-plane"></i> Confirm &amp; Submit</button>
+  </div>
+</div>
+
+<!-- ════ PAGE 6: RESULT ════ -->
+<div id="resultPage" class="pg">
+  <div class="result-card">
+    <img id="resultPhoto" class="result-photo" src="" alt="" style="display:none;">
+    <div class="result-icon">🎓</div>
+    <div class="result-title">Exam Submitted!</div>
+    <div class="result-sub" id="resultSub">Thank you for taking the exam</div>
+    <div class="result-score" id="resultScore">0</div>
+    <div class="result-of">out of <span id="resultTotal">0</span> marks</div>
+    <div class="result-grid">
+      <div class="rg g"><div class="n" id="rAns">0</div><div class="l">Answered</div></div>
+      <div class="rg r"><div class="n" id="rSkip">0</div><div class="l">Skipped</div></div>
+      <div class="rg b"><div class="n" id="rFlag">0</div><div class="l">Flagged</div></div>
+    </div>
+    <button class="btn-back" onclick="location.reload()"><i class="fas fa-redo"></i> Back to Portal</button>
+  </div>
+</div>
+
+<!-- Submit Modal -->
+<div class="modal-ov" id="submitModal">
+  <div class="modal">
+    <div class="mhd">
+      <div class="mhd-icon"><i class="fas fa-paper-plane" style="color:var(--green);"></i></div>
+      <div><div class="mhd-title">Submit Exam?</div><div class="mhd-sub">Review your stats before submitting</div></div>
+    </div>
+    <div class="mbody">
+      <div class="mstats">
+        <div class="mst g"><div class="n" id="msAns">0</div><div class="l">Answered</div></div>
+        <div class="mst y"><div class="n" id="msSkip">0</div><div class="l">Skipped</div></div>
+        <div class="mst r"><div class="n" id="msFlag">0</div><div class="l">Flagged</div></div>
+      </div>
+      <div class="mwarn"><i class="fas fa-triangle-exclamation"></i><span id="mwarnTxt">Please review before submitting.</span></div>
+    </div>
+    <div class="mfooter">
+      <button class="mbtn ghost" onclick="closeSubmitModal()">Cancel</button>
+      <button class="mbtn review" onclick="goToReview()"><i class="fas fa-eye"></i> Review</button>
+      <button class="mbtn submit" onclick="submitExam()"><i class="fas fa-check"></i> Submit Now</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────
+// Change this to your Railway backend URL after deployment
+const API_BASE = window.location.hostname === 'localhost'
+    ? 'http://localhost:8000'
+    : 'https://YOUR-RAILWAY-APP.railway.app';  // ← UPDATE THIS
+
+const WS_BASE = API_BASE.replace('http', 'ws').replace('https', 'wss');
+
+// ── STATE ────────────────────────────────────────────────────
+let studentHash   = '';
+let studentName   = '';
+let camStream     = null;
+let capturedPhoto = null;
+let ws            = null;
+let timerSec      = 3600;
+let timerInterval = null;
+let currentQ      = 0;
+let answers       = [];
+let flagged       = [];
+let SECTIONS      = [];
+let ALL_Q         = [];
+let TOTAL_Q       = 0;
+let examData      = null;
+let activeSec     = 'ALL';
+let warnPollInt   = null;
+let SEC_COLORS    = ['#1a73e8','#34a853','#7c4dff'];
+
+// ── API HELPER ───────────────────────────────────────────────
+async function api(path, body = null) {
+    const opts = {
+        method: body ? 'POST' : 'GET',
+        headers: { 'Content-Type': 'application/json' }
+    };
+    if (body) opts.body = JSON.stringify(body);
+    const res = await fetch(`${API_BASE}${path}`, opts);
+    if (!res.ok) {
+        const err = await res.json().catch(() => ({}));
+        throw new Error(err.detail || `HTTP ${res.status}`);
+    }
+    return res.json();
+}
+
+// ── PAGE SWITCHER ────────────────────────────────────────────
+function showPage(id) {
+    document.querySelectorAll('.pg').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+}
+
+// ── TOAST ────────────────────────────────────────────────────
+function toast(msg, type = 'info') {
+    const icons = { success:'fa-circle-check', error:'fa-circle-xmark', warn:'fa-triangle-exclamation', info:'fa-circle-info' };
+    const el = document.createElement('div');
+    el.className = `toast ${type}`;
+    el.innerHTML = `<i class="fas ${icons[type]}"></i><span>${msg}</span>`;
+    document.getElementById('toastWrap').appendChild(el);
+    setTimeout(() => { el.style.transition = 'opacity .3s'; el.style.opacity = '0'; setTimeout(() => el.remove(), 350); }, 3500);
+}
+
+// ── LOGIN ────────────────────────────────────────────────────
+async function doLogin() {
+    const name  = document.getElementById('loginName').value.trim();
+    const dob   = document.getElementById('loginDob').value.trim();
+    const token = document.getElementById('loginToken').value.trim();
+    if (!name)  { toast('Please enter your full name', 'warn'); return; }
+    if (!dob)   { toast('Please enter your date of birth', 'warn'); return; }
+    if (token !== 'MCT-XXJFB-1W6Y7') { toast('Invalid access token', 'error'); return; }
+
+    try {
+        const res = await api('/api/exam/login', { name, dob, token });
+        studentHash = res.student_hash;
+        studentName = res.student_name;
+        sessionStorage.setItem('student_hash', studentHash);
+        sessionStorage.setItem('student_name', studentName);
+        showPage('camPage');
+    } catch (e) {
+        toast(e.message || 'Login failed', 'error');
+    }
+}
+
+// ── CAMERA PERMISSIONS ───────────────────────────────────────
+async function requestPermissions() {
+    const btn = document.getElementById('permBtn');
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Requesting…';
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({ video: { width: 1280, height: 720, facingMode: 'user' }, audio: true });
+        camStream = stream;
+        ['cam','mic'].forEach(id => {
+            const el = document.getElementById(id + 'Badge');
+            el.textContent = 'Granted'; el.className = 'perm-badge ok';
+        });
+        btn.innerHTML = '<i class="fas fa-check-circle"></i> Access Granted';
+        btn.style.background = 'linear-gradient(135deg,var(--green),var(--teal))';
+        setTimeout(() => { showPage('photoPage'); setupPhotoCamera(); }, 700);
+    } catch (e) {
+        ['cam','mic'].forEach(id => {
+            const el = document.getElementById(id + 'Badge');
+            el.textContent = 'Denied'; el.className = 'perm-badge no';
+        });
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-shield-alt"></i> Grant Access &amp; Continue';
+        toast('Camera/microphone denied. Please allow in browser settings.', 'error');
+    }
+}
+
+// ── PHOTO CAPTURE ────────────────────────────────────────────
+function setupPhotoCamera() {
+    document.getElementById('photoVid').srcObject = camStream;
+}
+
+async function capturePhoto() {
+    const vid = document.getElementById('photoVid');
+    const canvas = document.getElementById('photoCanvas');
+    canvas.width = vid.videoWidth || 640;
+    canvas.height = vid.videoHeight || 480;
+    canvas.getContext('2d').drawImage(vid, 0, 0, canvas.width, canvas.height);
+    capturedPhoto = canvas.toDataURL('image/jpeg', 0.85);
+
+    canvas.style.display = 'block';
+    vid.style.display = 'none';
+    document.getElementById('camVp').classList.add('captured');
+    document.getElementById('captureBtn').style.display = 'none';
+    document.getElementById('retakeBtn').style.display = 'flex';
+    document.getElementById('proceedBtn').style.display = 'flex';
+    document.getElementById('photoOk').style.display = 'flex';
+    document.getElementById('camGuide').innerHTML = '<i class="fas fa-check-circle" style="color:var(--green)"></i> Photo captured! Proceed when ready.';
+
+    // Upload to backend
+    try {
+        await api('/api/exam/save-photo', { photo: capturedPhoto, student_hash: studentHash });
+        toast('Photo saved for verification', 'success');
+    } catch (e) {
+        toast('Photo saved locally (server upload failed)', 'warn');
+    }
+}
+
+function retakePhoto() {
+    const vid = document.getElementById('photoVid');
+    const canvas = document.getElementById('photoCanvas');
+    canvas.style.display = 'none';
+    vid.style.display = 'block';
+    document.getElementById('camVp').classList.remove('captured');
+    document.getElementById('captureBtn').style.display = 'flex';
+    document.getElementById('retakeBtn').style.display = 'none';
+    document.getElementById('proceedBtn').style.display = 'none';
+    document.getElementById('photoOk').style.display = 'none';
+    capturedPhoto = null;
+}
+
+async function proceedToExam() {
+    try {
+        const res = await api('/api/exam/questions');
+        examData = res.data;
+        SECTIONS = examData.sections;
+        ALL_Q = [];
+        SECTIONS.forEach((sec, si) => sec.questions.forEach((q, qi) => ALL_Q.push({ ...q, secId: sec.id, secIdx: si, qiSec: qi })));
+        TOTAL_Q = ALL_Q.length;
+        answers = new Array(TOTAL_Q).fill(null);
+        flagged = new Array(TOTAL_Q).fill(false);
+        timerSec = examData.total_time;
+        document.getElementById('navExamName').textContent = examData.exam_name;
+
+        // Try loading draft
+        try {
+            const draft = await api('/api/exam/load-draft', { student_hash: studentHash });
+            if (draft.success && draft.draft) {
+                answers  = draft.draft.answers  || answers;
+                flagged  = draft.draft.flagged  || flagged;
+                currentQ = draft.draft.current_q || 0;
+                timerSec = draft.draft.timer    || timerSec;
+                if (draft.draft.notes) document.getElementById('notes').value = draft.draft.notes;
+                toast('Previous draft restored', 'info');
+            }
+        } catch (e) {}
+
+        showPage('examPage');
+        document.getElementById('examVid').srcObject = camStream;
+        startTimer();
+        connectWebSocket();
+        startWarningPoll();
+        renderPalette();
+        renderSecTabs();
+        renderProgress();
+        renderSecNav();
+        renderQuestion(currentQ);
+        setupProctoring();
+        toast(`Welcome, ${studentName}! Exam started. Good luck! 🍀`, 'info');
+    } catch (e) {
+        toast('Failed to load exam: ' + e.message, 'error');
+    }
+}
+
+// ── WEBSOCKET ────────────────────────────────────────────────
+function connectWebSocket() {
+    if (!studentHash) return;
+    try {
+        ws = new WebSocket(`${WS_BASE}/api/exam/ws/student/${studentHash}`);
+
+        ws.onopen = () => {
+            console.log('Connected to proctor');
+            startSnapshotLoop();
+        };
+
+        ws.onmessage = (e) => {
+            const data = JSON.parse(e.data);
+            if (data.type === 'warning') showWarning(data.message, data.severity);
+            if (data.type === 'terminated') {
+                toast('Your session was terminated by the proctor.', 'error');
+                setTimeout(() => location.reload(), 3000);
+            }
+            if (data.type === 'pong') {}
+        };
+
+        ws.onclose = () => {
+            // Reconnect after 3s
+            setTimeout(connectWebSocket, 3000);
+        };
+
+        ws.onerror = (e) => console.error('WS error', e);
+    } catch (e) {
+        console.error('WebSocket connection failed:', e);
+    }
+}
+
+let snapInterval = null;
+function startSnapshotLoop() {
+    if (snapInterval) clearInterval(snapInterval);
+    snapInterval = setInterval(sendSnapshot, 8000);
+}
+
+function sendSnapshot() {
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const vid = document.getElementById('examVid');
+    if (!vid || !vid.srcObject) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = 320; canvas.height = 240;
+    canvas.getContext('2d').drawImage(vid, 0, 0, 320, 240);
+    ws.send(JSON.stringify({
+        type: 'snapshot',
+        snapshot: canvas.toDataURL('image/jpeg', 0.4),
+        timestamp: Date.now()
+    }));
+}
+
+// Fallback: poll for warnings if WS not connected
+function startWarningPoll() {
+    warnPollInt = setInterval(async () => {
+        if (ws && ws.readyState === WebSocket.OPEN) return; // WS handles it
+        try {
+            const res = await api(`/api/exam/session/${studentHash}/warnings`);
+            if (res.warnings && res.warnings.length > 0) {
+                res.warnings.forEach(w => showWarning(w.message, w.severity));
+            }
+        } catch (e) {}
+    }, 10000);
+}
+
+function showWarning(msg, severity = 'MEDIUM') {
+    document.getElementById('warnMsg').textContent = msg;
+    const banner = document.getElementById('warnBanner');
+    banner.className = 'warn-banner show';
+    if (severity === 'CRITICAL' || severity === 'HIGH') {
+        banner.style.background = 'var(--red)';
+    } else {
+        banner.style.background = 'var(--orange)';
+    }
+    toast(`⚠ Proctor: ${msg}`, 'warn');
+}
+
+function dismissWarning() {
+    document.getElementById('warnBanner').classList.remove('show');
+}
+
+// ── PROCTORING: Tab switch / visibility detection ────────────
+function setupProctoring() {
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) sendFlag('TAB_SWITCH', 'HIGH', 'Student switched to another tab');
+    });
+    window.addEventListener('blur', () => {
+        sendFlag('WINDOW_BLUR', 'MEDIUM', 'Exam window lost focus');
+    });
+}
+
+function sendFlag(type, severity, desc) {
+    if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: 'flag', flag_type: type, severity, description: desc }));
+    }
+}
+
+// ── TIMER ────────────────────────────────────────────────────
+function startTimer() {
+    timerInterval = setInterval(() => {
+        timerSec--;
+        const m = Math.floor(timerSec / 60), s = timerSec % 60;
+        document.getElementById('timerDisp').textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+        if (timerSec <= 300) document.getElementById('timerBox').classList.add('danger');
+        if (timerSec <= 0) { clearInterval(timerInterval); toast('Time up! Auto-submitting…', 'warn'); setTimeout(submitExam, 1500); }
+    }, 1000);
+}
+
+// ── DRAFT ────────────────────────────────────────────────────
+async function saveDraft() {
+    try {
+        await api('/api/exam/save-draft', {
+            student_hash: studentHash,
+            answers, flagged,
+            current_q: currentQ,
+            timer: timerSec,
+            notes: document.getElementById('notes')?.value || ''
+        });
+        const btn = document.getElementById('draftBtn');
+        btn.classList.add('saved');
+        btn.innerHTML = '<i class="fas fa-check"></i> Saved';
+        toast('Draft saved', 'success');
+        setTimeout(() => { btn.classList.remove('saved'); btn.innerHTML = '<i class="fas fa-save"></i> Save Draft'; }, 2500);
+    } catch (e) { toast('Draft save failed', 'error'); }
+}
+
+// Auto-save every 60s
+setInterval(() => { if (studentHash && document.getElementById('examPage').classList.contains('active')) saveDraft(); }, 60000);
+
+// ── PALETTE & TABS ───────────────────────────────────────────
+function renderSecTabs() {
+    const tabs = [{ id:'ALL', name:'All' }, ...SECTIONS.map(s => ({ id:s.id, name:s.id }))];
+    document.getElementById('secTabs').innerHTML = tabs.map(t =>
+        `<div class="sec-tab ${activeSec===t.id?'active':''}" onclick="switchSec('${t.id}')">${t.name}</div>`
+    ).join('');
+}
+
+function switchSec(id) { activeSec = id; renderSecTabs(); renderPalette(); }
+
+function renderPalette() {
+    const grid = document.getElementById('qgrid');
+    const secs = activeSec === 'ALL' ? SECTIONS : SECTIONS.filter(s => s.id === activeSec);
+    grid.innerHTML = secs.map(sec => {
+        const qs = ALL_Q.filter(q => q.secId === sec.id);
+        return `<div class="sec-group">
+            <div class="sec-group-label" style="color:${SEC_COLORS[SECTIONS.indexOf(sec)]};">
+                ${sec.name} <span>${qs.filter(q=>answers[ALL_Q.indexOf(q)]!==null).length}/${qs.length}</span>
+            </div>
+            <div class="qnums">${qs.map(q => {
+                const gi = ALL_Q.indexOf(q);
+                const cls = gi===currentQ?'cur':flagged[gi]?'flg':answers[gi]!==null?'ans':'';
+                return `<div class="qn ${cls}" onclick="goToQ(${gi})">${q.id}</div>`;
+            }).join('')}</div>
+        </div>`;
+    }).join('');
+}
+
+// ── PROGRESS ────────────────────────────────────────────────
+function renderProgress() {
+    let total = 0, ans = 0;
+    let html = SECTIONS.map((sec, si) => {
+        const qs = ALL_Q.filter(q => q.secId === sec.id);
+        const a = qs.filter(q => answers[ALL_Q.indexOf(q)] !== null).length;
+        const pct = Math.round(a / qs.length * 100);
+        total += qs.length; ans += a;
+        return `<div class="prog-item">
+            <div class="prog-label"><span style="color:${SEC_COLORS[si]}">${sec.name}</span><span>${a}/${qs.length}</span></div>
+            <div class="prog-bar"><div class="prog-fill" style="width:${pct}%;background:${SEC_COLORS[si]};"></div></div>
+        </div>`;
+    }).join('');
+    const ovPct = total ? Math.round(ans / total * 100) : 0;
+    html += `<div class="prog-item" style="padding-top:8px;border-top:1px solid var(--border);margin-top:4px;">
+        <div class="prog-label"><span>Overall</span><span>${ans}/${total} (${ovPct}%)</span></div>
+        <div class="prog-bar"><div class="prog-fill" style="width:${ovPct}%;background:linear-gradient(90deg,var(--green),var(--teal));"></div></div>
+    </div>`;
+    const flags = flagged.filter(Boolean).length;
+    html += `<div class="mini-stats">
+        <div class="ms a"><div class="n">${ans}</div><div class="l">Done</div></div>
+        <div class="ms u"><div class="n">${total-ans}</div><div class="l">Left</div></div>
+        <div class="ms f"><div class="n">${flags}</div><div class="l">Flagged</div></div>
+        <div class="ms t"><div class="n">${total}</div><div class="l">Total</div></div>
+    </div>`;
+    document.getElementById('sbProgress').innerHTML = html;
+}
+
+function renderSecNav() {
+    const curSec = ALL_Q[currentQ]?.secId;
+    document.getElementById('sbSections').innerHTML = SECTIONS.map((sec, si) => {
+        const qs = ALL_Q.filter(q => q.secId === sec.id);
+        const firstIdx = ALL_Q.findIndex(q => q.secId === sec.id);
+        const a = qs.filter(q => answers[ALL_Q.indexOf(q)] !== null).length;
+        return `<div class="sec-nav-item ${curSec===sec.id?'act':''}" onclick="goToQ(${firstIdx})">
+            <div class="sec-nav-icon" style="background:${sec.bg};color:${SEC_COLORS[si]};"><i class="fas fa-layer-group"></i></div>
+            <div><div class="sec-nav-name" style="color:${SEC_COLORS[si]}">${sec.name}</div><div class="sec-nav-meta">${sec.subtitle} · ${a}/${qs.length} done</div></div>
+            <i class="fas fa-arrow-right" style="font-size:11px;color:var(--text2);"></i>
+        </div>`;
+    }).join('');
+}
+
+// ── RENDER QUESTION ──────────────────────────────────────────
+function h(str) {
+    if (!str && str !== 0) return '';
+    return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderQuestion(idx) {
+    currentQ = idx;
+    const q   = ALL_Q[idx];
+    const sec = SECTIONS[q.secIdx];
+    const a   = answers[idx];
+    const isLast = idx === TOTAL_Q - 1;
+    const col = SEC_COLORS[q.secIdx];
+
+    document.getElementById('qCrumb').innerHTML = `
+        <span class="crumb-sec" style="background:${sec.bg};color:${col};border-color:${col}40;">${sec.name}</span>
+        <span class="crumb-sep">·</span><span class="crumb-info">${sec.subtitle}</span>
+        <span class="crumb-sep">·</span><span class="crumb-info">Q${q.qiSec+1} of ${sec.questions.length}</span>`;
+
+    document.getElementById('qNavLabel').textContent = `Q${idx+1} of ${TOTAL_Q}`;
+    document.getElementById('qNavSub').textContent = a !== null ? '✓ Answered' : 'Not yet answered';
+    document.getElementById('prevBtn').disabled = (idx === 0);
+    document.getElementById('nextBtn').style.display = isLast ? 'none' : 'flex';
+    document.getElementById('finishBtn').style.display = isLast ? 'flex' : 'none';
+
+    let qBody = '';
+    if (q.type === 'MCQ') {
+        qBody = `<div class="opts">${q.opts.map((o,i) =>
+            `<div class="opt ${a===i?'sel':''}" onclick="setAnswer(${idx},${i})">
+                <div class="opt-lt">${['A','B','C','D'][i]}</div>
+                <div>${h(o)}</div>
+            </div>`).join('')}</div>`;
+    } else {
+        qBody = `<input class="fill-in" type="text" placeholder="Type your answer…"
+            value="${a !== null ? h(String(a)) : ''}"
+            oninput="setAnswer(${idx}, this.value)">`;
+    }
+
+    document.getElementById('qContainer').innerHTML = `
+        <div class="q-card" style="border-left:4px solid ${col};">
+            <div class="q-meta">
+                <span class="q-num-badge" style="background:${col};">Q.${q.id}</span>
+                <span class="q-marks-badge"><i class="fas fa-star" style="font-size:10px;margin-right:3px;"></i>${q.marks} Mark${q.marks>1?'s':''}</span>
+                <span class="q-type-badge">${q.type === 'MCQ' ? 'MCQ' : 'Fill in Blank'}</span>
+                <button class="q-flag-btn ${flagged[idx]?'on':''}" onclick="toggleFlag(${idx})" title="Flag for review"><i class="fas fa-flag"></i></button>
+            </div>
+            <div class="q-text">${h(q.text)}</div>
+            ${qBody}
+        </div>`;
+
+    document.getElementById('qScroll').scrollTop = 0;
+    renderPalette(); renderSecTabs(); renderProgress(); renderSecNav();
+}
+
+function setAnswer(idx, val) {
+    answers[idx] = (val === '' || val === null) ? null : val;
+    if (typeof val === 'string' && val.trim() === '') answers[idx] = null;
+    renderQuestion(idx);
+    setTimeout(saveDraft, 800);
+}
+
+function toggleFlag(idx) { flagged[idx] = !flagged[idx]; renderPalette(); renderProgress(); renderQuestion(idx); }
+function goToQ(idx)  { renderQuestion(idx); }
+function nextQ()     { if (currentQ < TOTAL_Q-1) renderQuestion(currentQ+1); }
+function prevQ()     { if (currentQ > 0) renderQuestion(currentQ-1); }
+function toggleSB(hd){ hd.classList.toggle('open'); hd.nextElementSibling.classList.toggle('open'); }
+
+// ── CALCULATOR ───────────────────────────────────────────────
+let cs = { val:'0', expr:'', op:null, prev:null, nw:true };
+function ca(k) {
+    if(k==='C'){cs={val:'0',expr:'',op:null,prev:null,nw:true};}
+    else if(k==='±'){cs.val=String(-parseFloat(cs.val)||0);}
+    else if(k==='%'){cs.val=String(parseFloat(cs.val)/100);}
+    else if(['+','-','*','/'].includes(k)){cs.prev=parseFloat(cs.val);cs.op=k;cs.expr=cs.val+' '+({'+':'+','-':'−','*':'×','/':'÷'}[k]);cs.nw=true;}
+    else if(k==='='){
+        if(cs.op&&cs.prev!==null){
+            const c=parseFloat(cs.val);let r;
+            if(cs.op==='+')r=cs.prev+c;else if(cs.op==='-')r=cs.prev-c;else if(cs.op==='*')r=cs.prev*c;else r=c?cs.prev/c:'Error';
+            cs.expr=cs.expr+' '+cs.val+' =';cs.val=String(typeof r==='number'?parseFloat(r.toFixed(10)):r);cs.op=null;cs.prev=null;cs.nw=true;
+        }
+    }
+    else if(k==='.'){if(cs.nw){cs.val='0.';cs.nw=false;}else if(!cs.val.includes('.'))cs.val+=k;}
+    else{if(cs.nw||cs.val==='0'||cs.val==='Error'){cs.val=k;cs.nw=false;}else cs.val+=k;}
+    document.getElementById('cVal').textContent = cs.val;
+    document.getElementById('cExpr').textContent = cs.expr;
+}
+
+// ── SUBMIT MODAL ─────────────────────────────────────────────
+function openSubmitModal() {
+    const a = answers.filter(x => x !== null).length;
+    const u = TOTAL_Q - a;
+    const f = flagged.filter(Boolean).length;
+    document.getElementById('msAns').textContent = a;
+    document.getElementById('msSkip').textContent = u;
+    document.getElementById('msFlag').textContent = f;
+    document.getElementById('mwarnTxt').textContent = u > 0
+        ? `⚠ ${u} question${u>1?'s are':' is'} unanswered. Review or submit now.`
+        : '✓ All questions answered. You may submit.';
+    document.getElementById('submitModal').classList.add('open');
+}
+function closeSubmitModal() { document.getElementById('submitModal').classList.remove('open'); }
+
+// ── REVIEW PAGE ──────────────────────────────────────────────
+function goToReview() {
+    closeSubmitModal();
+    buildReview();
+    showPage('reviewPage');
+}
+
+function buildReview() {
+    const a = answers.filter(x => x !== null).length;
+    const u = TOTAL_Q - a;
+    const f = flagged.filter(Boolean).length;
+    document.getElementById('revStats').innerHTML = `
+        <div class="rv-s"><div class="rv-dot" style="background:var(--green);"></div>${a} Answered</div>
+        <div class="rv-s"><div class="rv-dot" style="background:var(--yellow);"></div>${u} Skipped</div>
+        <div class="rv-s"><div class="rv-dot" style="background:var(--orange);"></div>${f} Flagged</div>`;
+
+    document.getElementById('revBody').innerHTML = SECTIONS.map((sec, si) => {
+        const qs = ALL_Q.filter(q => q.secId === sec.id);
+        const secAns = qs.filter(q => answers[ALL_Q.indexOf(q)] !== null).length;
+        return `<div class="rev-sec">
+            <div class="rev-sec-title" style="background:${sec.bg};border-left:4px solid ${SEC_COLORS[si]};">
+                <i class="fas fa-layer-group" style="color:${SEC_COLORS[si]};"></i>
+                ${sec.name} — ${sec.subtitle}
+                <span style="margin-left:auto;background:${sec.bg};color:${SEC_COLORS[si]};font-size:11px;font-weight:600;padding:3px 9px;border-radius:100px;">${secAns}/${qs.length}</span>
+            </div>
+            <div class="rev-grid">${qs.map(q => {
+                const gi = ALL_Q.indexOf(q);
+                const qa = answers[gi];
+                const isAns = qa !== null;
+                const isFlagged = flagged[gi];
+                let ansHtml = '';
+                if (isAns) {
+                    if (q.type === 'MCQ') ansHtml = `<div class="rev-ans a"><i class="fas fa-check-circle"></i>${['A','B','C','D'][qa]}. ${h(q.opts[qa])}</div>`;
+                    else ansHtml = `<div class="rev-ans a"><i class="fas fa-pen"></i>${h(String(qa))}</div>`;
+                } else {
+                    ansHtml = `<div class="rev-ans s"><i class="fas fa-minus-circle"></i>Not answered</div>`;
+                }
+                return `<div class="rev-q ${isAns?'answered':'skipped'}" onclick="editQ(${gi})">
+                    <div class="rev-qhd">
+                        <span class="rev-qnum" style="background:${SEC_COLORS[si]};">Q.${q.id}</span>
+                        <span class="rev-stat ${isAns?'a':'s'}">${isAns?'Answered':'Skipped'}</span>
+                        ${isFlagged?`<span class="rev-stat f"><i class="fas fa-flag"></i> Flagged</span>`:''}
+                        <span class="rev-edit"><i class="fas fa-edit"></i> Edit</span>
+                    </div>
+                    <div class="rev-qtext">${h(q.text.length>100?q.text.substring(0,100)+'…':q.text)}</div>
+                    ${ansHtml}
+                </div>`;
+            }).join('')}</div>
+        </div>`;
+    }).join('');
+}
+
+function editQ(idx) { showPage('examPage'); renderQuestion(idx); }
+function backToExam() { showPage('examPage'); }
+
+// ── SUBMIT EXAM ──────────────────────────────────────────────
+async function submitExam() {
+    clearInterval(timerInterval);
+    clearInterval(warnPollInt);
+    clearInterval(snapInterval);
+    if (ws) ws.close();
+    if (camStream) camStream.getTracks().forEach(t => t.stop());
+    closeSubmitModal();
+
+    try {
+        const res = await api('/api/exam/submit', {
+            student_hash: studentHash,
+            answers, flagged,
+            timer: timerSec
+        });
+
+        const score = res.score;
+        const ansCount = answers.filter(x => x !== null).length;
+
+        document.getElementById('resultSub').textContent = `${studentName} — ${examData.exam_name}`;
+        document.getElementById('resultScore').textContent = score.obtained_marks;
+        document.getElementById('resultTotal').textContent = score.total_marks;
+        document.getElementById('rAns').textContent = ansCount;
+        document.getElementById('rSkip').textContent = TOTAL_Q - ansCount;
+        document.getElementById('rFlag').textContent = flagged.filter(Boolean).length;
+
+        if (capturedPhoto) {
+            const img = document.getElementById('resultPhoto');
+            img.src = capturedPhoto;
+            img.style.display = 'block';
+            document.querySelector('.result-icon').style.display = 'none';
+        }
+
+        showPage('resultPage');
+    } catch (e) {
+        toast('Submission failed: ' + e.message, 'error');
+    }
+}
+</script>
+</body>
+</html>
